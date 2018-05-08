@@ -9,9 +9,9 @@
                 "can": [
                         "can0"
                 ],
-                "led": [
+                "led": {
                         "myc:blue":"cpu0 - D30  - Core Board"
-                ],
+                },
                 "system": {
                         "HMI_version": "MEasy HMI V1.0",
                         "linux_version": "linux-4.1.15",
@@ -21,7 +21,7 @@
                         "board": "MYD-Y6ULX",
                         "CPU": "i.MX6ULL",
                         "memory": "256MB",
-                        "storage": "256M"
+                        "storage": "256MB"
                 }
         },
 
