@@ -6,13 +6,14 @@ import json
 from collections import OrderedDict
 
 def cmdline_read():
+    rel=' '
     str_param='rootfstype='
     len_str_check=len(str_param)
     f = open("/proc/cmdline")
     lines = f.readlines()
     #print lines[0]
     read_param=lines[0].split(' ')
-    read_param=sr.split(' ')
+    #read_param=sr.split(' ')
     for i in range(0,len(read_param)):
         if read_param[i][0:len_str_check]=="rootfstype=":
             # print read_param[i][len_str_check:]
