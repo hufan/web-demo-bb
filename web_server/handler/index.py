@@ -404,8 +404,8 @@ class Parse_command():
             eth_op._eth_handler_to_sent()
         elif eth_control==3:   ##  ping 测试
             ping_ip=python_object["ping_addr"]
-            if judge_legal_ip2(ping_ip):
-               for i in range(10):
+            #if judge_legal_ip2(ping_ip):
+            for i in range(10):
                 ping_log=verbose_ping_2(ping_ip,2)
                 eth_data = MyClass_json()
                 eth_data.name_cmd = "eth_data"
