@@ -7,7 +7,6 @@ class sqlite3_base
 {
 public:
     sqlite3 *sql_db;
-
     int sqlread_nrow;
 	int sqlread_ncolumn;
 
