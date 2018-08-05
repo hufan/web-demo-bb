@@ -37,7 +37,7 @@ dataview::dataview(QWidget *parent) :
     sql_test=new sqlite3_base();
     sql_test->sqlite3_base_open("RHMI.db");
     sql_test->sqlite3_base_create_tab();
-    sql_test->sqlite3_base_insert_data();
+//    sql_test->sqlite3_base_insert_data();
     arr_sqldata=sql_test->sqlite3_base_read_data();
 
 //     qDebug()<<"nrow-"<<sql_test->sqlread_nrow<<"ncolumn-"<<sql_test->sqlread_ncolumn<<endl;

@@ -66,9 +66,9 @@
      <string/>
     </property>
    </widget>
-   <zorder>groupBox_2</zorder>
    <zorder>groupBox</zorder>
    <zorder>pushButton</zorder>
+   <zorder>groupBox_2</zorder>
    <zorder>pushButton_2</zorder>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>

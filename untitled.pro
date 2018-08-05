@@ -20,15 +20,18 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     dataview.cpp \
     sqlite3_base.cpp \
-    publicfile.cpp
+    publicfile.cpp \
+    ui_led.cpp
 
 HEADERS  += mainwindow.h \
     dataview.h \
     sqlite3_base.h \
-    publicfile.h
+    publicfile.h \
+    ui_led.h
 
 FORMS    += mainwindow.ui \
-    dataview.ui
+    dataview.ui \
+    ui_led.ui
 
 
 LIBS += -L/usr/lib/libsqlite3.so.0.8.6

@@ -52,15 +52,19 @@ SOURCES       = main.cpp \
 		mainwindow.cpp \
 		dataview.cpp \
 		sqlite3_base.cpp \
-		publicfile.cpp moc_mainwindow.cpp \
-		moc_dataview.cpp
+		publicfile.cpp \
+		ui_led.cpp moc_mainwindow.cpp \
+		moc_dataview.cpp \
+		moc_ui_led.cpp
 OBJECTS       = main.o \
 		mainwindow.o \
 		dataview.o \
 		sqlite3_base.o \
 		publicfile.o \
+		ui_led.o \
 		moc_mainwindow.o \
-		moc_dataview.o
+		moc_dataview.o \
+		moc_ui_led.o
 DIST          = /opt/qt5.6.2/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/lib/qt5/mkspecs/features/spec_pre.prf \
 		/opt/qt5.6.2/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/lib/qt5/mkspecs/common/unix.conf \
 		/opt/qt5.6.2/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/lib/qt5/mkspecs/common/linux.conf \
@@ -192,11 +196,13 @@ DIST          = /opt/qt5.6.2/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/lib
 		untitled.pro mainwindow.h \
 		dataview.h \
 		sqlite3_base.h \
-		publicfile.h main.cpp \
+		publicfile.h \
+		ui_led.h main.cpp \
 		mainwindow.cpp \
 		dataview.cpp \
 		sqlite3_base.cpp \
-		publicfile.cpp
+		publicfile.cpp \
+		ui_led.cpp
 QMAKE_TARGET  = untitled
 DESTDIR       = 
 TARGET        = untitled
@@ -205,7 +211,7 @@ TARGET        = untitled
 first: all
 ####### Build rules
 
-$(TARGET): ui_mainwindow.h ui_dataview.h $(OBJECTS)  
+$(TARGET): ui_mainwindow.h ui_dataview.h ui_ui_led.h $(OBJECTS)  
 	$(LINK) $(LFLAGS) -o $(TARGET) $(OBJECTS) $(OBJCOMP) $(LIBS)
 
 Makefile: untitled.pro /opt/qt5.6.2/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/lib/qt5/mkspecs/linux-oe-g++/qmake.conf /opt/qt5.6.2/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/lib/qt5/mkspecs/features/spec_pre.prf \
@@ -489,9 +495,9 @@ dist: distdir FORCE
 distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
-	$(COPY_FILE) --parents mainwindow.h dataview.h sqlite3_base.h publicfile.h $(DISTDIR)/
-	$(COPY_FILE) --parents main.cpp mainwindow.cpp dataview.cpp sqlite3_base.cpp publicfile.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents mainwindow.ui dataview.ui $(DISTDIR)/
+	$(COPY_FILE) --parents mainwindow.h dataview.h sqlite3_base.h publicfile.h ui_led.h $(DISTDIR)/
+	$(COPY_FILE) --parents main.cpp mainwindow.cpp dataview.cpp sqlite3_base.cpp publicfile.cpp ui_led.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents mainwindow.ui dataview.ui ui_led.ui $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -516,11 +522,12 @@ benchmark: first
 
 compiler_rcc_make_all:
 compiler_rcc_clean:
-compiler_moc_header_make_all: moc_mainwindow.cpp moc_dataview.cpp
+compiler_moc_header_make_all: moc_mainwindow.cpp moc_dataview.cpp moc_ui_led.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) moc_mainwindow.cpp moc_dataview.cpp
+	-$(DEL_FILE) moc_mainwindow.cpp moc_dataview.cpp moc_ui_led.cpp
 moc_mainwindow.cpp: dataview.h \
 		sqlite3_base.h \
+		ui_led.h \
 		mainwindow.h
 	/opt/qt5.6.2/sysroots/x86_64-pokysdk-linux/usr/bin/qt5/moc $(DEFINES) -I/opt/qt5.6.2/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/lib/qt5/mkspecs/linux-oe-g++ -I/home/eum/work/work_2018/web-demo-bb -I/opt/qt5.6.2/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include/qt5 -I/opt/qt5.6.2/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include/qt5/QtWidgets -I/opt/qt5.6.2/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include/qt5/QtGui -I/opt/qt5.6.2/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include/qt5/QtSql -I/opt/qt5.6.2/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include/qt5/QtCore -I/opt/qt5.6.2/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include/c++/5.3.0 -I/opt/qt5.6.2/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include/c++/5.3.0/arm-poky-linux-gnueabi -I/opt/qt5.6.2/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include/c++/5.3.0/backward -I/opt/qt5.6.2/sysroots/x86_64-pokysdk-linux/lib/arm-poky-linux-gnueabi/gcc/arm-poky-linux-gnueabi/5.3.0/include -I/opt/qt5.6.2/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/lib/gcc/arm-poky-linux-gnueabi/5.3.0/include -I/opt/qt5.6.2/sysroots/x86_64-pokysdk-linux/lib/arm-poky-linux-gnueabi/gcc/arm-poky-linux-gnueabi/5.3.0/include-fixed -I/opt/qt5.6.2/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include mainwindow.h -o moc_mainwindow.cpp
 
@@ -528,16 +535,22 @@ moc_dataview.cpp: sqlite3_base.h \
 		dataview.h
 	/opt/qt5.6.2/sysroots/x86_64-pokysdk-linux/usr/bin/qt5/moc $(DEFINES) -I/opt/qt5.6.2/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/lib/qt5/mkspecs/linux-oe-g++ -I/home/eum/work/work_2018/web-demo-bb -I/opt/qt5.6.2/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include/qt5 -I/opt/qt5.6.2/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include/qt5/QtWidgets -I/opt/qt5.6.2/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include/qt5/QtGui -I/opt/qt5.6.2/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include/qt5/QtSql -I/opt/qt5.6.2/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include/qt5/QtCore -I/opt/qt5.6.2/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include/c++/5.3.0 -I/opt/qt5.6.2/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include/c++/5.3.0/arm-poky-linux-gnueabi -I/opt/qt5.6.2/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include/c++/5.3.0/backward -I/opt/qt5.6.2/sysroots/x86_64-pokysdk-linux/lib/arm-poky-linux-gnueabi/gcc/arm-poky-linux-gnueabi/5.3.0/include -I/opt/qt5.6.2/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/lib/gcc/arm-poky-linux-gnueabi/5.3.0/include -I/opt/qt5.6.2/sysroots/x86_64-pokysdk-linux/lib/arm-poky-linux-gnueabi/gcc/arm-poky-linux-gnueabi/5.3.0/include-fixed -I/opt/qt5.6.2/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include dataview.h -o moc_dataview.cpp
 
+moc_ui_led.cpp: ui_led.h
+	/opt/qt5.6.2/sysroots/x86_64-pokysdk-linux/usr/bin/qt5/moc $(DEFINES) -I/opt/qt5.6.2/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/lib/qt5/mkspecs/linux-oe-g++ -I/home/eum/work/work_2018/web-demo-bb -I/opt/qt5.6.2/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include/qt5 -I/opt/qt5.6.2/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include/qt5/QtWidgets -I/opt/qt5.6.2/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include/qt5/QtGui -I/opt/qt5.6.2/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include/qt5/QtSql -I/opt/qt5.6.2/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include/qt5/QtCore -I/opt/qt5.6.2/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include/c++/5.3.0 -I/opt/qt5.6.2/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include/c++/5.3.0/arm-poky-linux-gnueabi -I/opt/qt5.6.2/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include/c++/5.3.0/backward -I/opt/qt5.6.2/sysroots/x86_64-pokysdk-linux/lib/arm-poky-linux-gnueabi/gcc/arm-poky-linux-gnueabi/5.3.0/include -I/opt/qt5.6.2/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/lib/gcc/arm-poky-linux-gnueabi/5.3.0/include -I/opt/qt5.6.2/sysroots/x86_64-pokysdk-linux/lib/arm-poky-linux-gnueabi/gcc/arm-poky-linux-gnueabi/5.3.0/include-fixed -I/opt/qt5.6.2/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include ui_led.h -o moc_ui_led.cpp
+
 compiler_moc_source_make_all:
 compiler_moc_source_clean:
-compiler_uic_make_all: ui_mainwindow.h ui_dataview.h
+compiler_uic_make_all: ui_mainwindow.h ui_dataview.h ui_ui_led.h
 compiler_uic_clean:
-	-$(DEL_FILE) ui_mainwindow.h ui_dataview.h
+	-$(DEL_FILE) ui_mainwindow.h ui_dataview.h ui_ui_led.h
 ui_mainwindow.h: mainwindow.ui
 	/opt/qt5.6.2/sysroots/x86_64-pokysdk-linux/usr/bin/qt5/uic mainwindow.ui -o ui_mainwindow.h
 
 ui_dataview.h: dataview.ui
 	/opt/qt5.6.2/sysroots/x86_64-pokysdk-linux/usr/bin/qt5/uic dataview.ui -o ui_dataview.h
+
+ui_ui_led.h: ui_led.ui
+	/opt/qt5.6.2/sysroots/x86_64-pokysdk-linux/usr/bin/qt5/uic ui_led.ui -o ui_ui_led.h
 
 compiler_yacc_decl_make_all:
 compiler_yacc_decl_clean:
@@ -551,12 +564,14 @@ compiler_clean: compiler_moc_header_clean compiler_uic_clean
 
 main.o: main.cpp mainwindow.h \
 		dataview.h \
-		sqlite3_base.h
+		sqlite3_base.h \
+		ui_led.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
 
 mainwindow.o: mainwindow.cpp mainwindow.h \
 		dataview.h \
 		sqlite3_base.h \
+		ui_led.h \
 		ui_mainwindow.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mainwindow.o mainwindow.cpp
 
@@ -571,11 +586,18 @@ sqlite3_base.o: sqlite3_base.cpp sqlite3_base.h
 publicfile.o: publicfile.cpp publicfile.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o publicfile.o publicfile.cpp
 
+ui_led.o: ui_led.cpp ui_led.h \
+		ui_ui_led.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o ui_led.o ui_led.cpp
+
 moc_mainwindow.o: moc_mainwindow.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_mainwindow.o moc_mainwindow.cpp
 
 moc_dataview.o: moc_dataview.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_dataview.o moc_dataview.cpp
+
+moc_ui_led.o: moc_ui_led.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_ui_led.o moc_ui_led.cpp
 
 ####### Install
 

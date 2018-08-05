@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>dataview</class>
- <widget class="QDialog" name="dataview">
+ <class>ui_led</class>
+ <widget class="QDialog" name="ui_led">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -13,14 +13,17 @@
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <widget class="QTableView" name="tableView">
+  <widget class="QGroupBox" name="groupBox">
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>100</y>
-     <width>561</width>
-     <height>381</height>
+     <y>120</y>
+     <width>551</width>
+     <height>331</height>
     </rect>
+   </property>
+   <property name="title">
+    <string>GroupBox</string>
    </property>
   </widget>
  </widget>
