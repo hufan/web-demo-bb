@@ -2,10 +2,84 @@
 #include "ui_mainwindow.h"
 
 
-#define CAMERA_DEVICE "/dev/video1"
+//#include "highgui.h"
+//#include "objdetect/objdetect.hpp"
+//#include "imgproc/imgproc.hpp"
+ 
 
-#define  WIDTH    800
-#define  HEIGHT   600
+using namespace std;
+using namespace cv;
+
+
+cv::Mat QImage_to_cvMat( const QImage &image, bool inCloneImageData = true ) {
+  switch ( image.format() )
+  {
+     // 8-bit, 4 channel
+     case QImage::Format_RGB32:
+     {
+        cv::Mat mat( image.height(), image.width(), CV_8UC4, const_cast<uchar*>(image.bits()), image.bytesPerLine() );
+        return (inCloneImageData ? mat.clone() : mat);
+     }
+
+     // 8-bit, 3 channel
+     case QImage::Format_RGB888:
+     {
+        if ( !inCloneImageData ) {
+           qWarning() << "ASM::QImageToCvMat() - Conversion requires cloning since we use a temporary QImage";
+        }
+        QImage swapped = image.rgbSwapped();
+        return cv::Mat( swapped.height(), swapped.width(), CV_8UC3, const_cast<uchar*>(swapped.bits()), swapped.bytesPerLine() ).clone();
+     }
+
+     // 8-bit, 1 channel
+     case QImage::Format_Indexed8:
+     {
+        cv::Mat  mat( image.height(), image.width(), CV_8UC1, const_cast<uchar*>(image.bits()), image.bytesPerLine() );
+
+        return (inCloneImageData ? mat.clone() : mat);
+     }
+
+     default:
+//        qDebug("Image format is not supported: depth=%d and %d format\n", image.depth(), image.format(););
+        break;
+  }
+
+  return cv::Mat();
+}
+
+QImage  Mat2QImage(cv::Mat cvImg)
+{
+    QImage qImg;
+//	 channels color image
+	 	
+    if(cvImg.channels()==3)                             //3
+    {
+
+        cv::cvtColor(cvImg,cvImg,CV_BGR2RGB);
+        qImg =QImage((const unsigned char*)(cvImg.data),
+                    cvImg.cols, cvImg.rows,
+                    cvImg.cols*cvImg.channels(),
+                    QImage::Format_RGB888);
+    }
+    else if(cvImg.channels()==1)                    //grayscale image
+    {
+        qImg =QImage((const unsigned char*)(cvImg.data),
+                    cvImg.cols,cvImg.rows,
+                    cvImg.cols*cvImg.channels(),
+                    QImage::Format_Indexed8);
+    }
+    else
+    {
+        qImg =QImage((const unsigned char*)(cvImg.data),
+                    cvImg.cols,cvImg.rows,
+                    cvImg.cols*cvImg.channels(),
+                    QImage::Format_RGB888);
+    }
+
+    return qImg;
+
+}
+
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -17,8 +91,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
 //	int ret,i;
 
-	
 	init_v4l2();
+
+	init_Classifier();
 
 
 	time1 = new QTimer(this);
@@ -329,8 +404,24 @@ err:
 int MainWindow::disaply_image()
 {
 	// update
-       convert_yuv_to_rgb_buffer(framebuffer,tmpbuffer,WIDTH,HEIGHT/*QWidget::width(),QWidget::height()*/);
-	
+       QImage image = convert_yuv_to_rgb_buffer(framebuffer,tmpbuffer,WIDTH,HEIGHT/*QWidget::width(),QWidget::height()*/);
+
+	//	QImage image = QImage(rgb, width,height, QImage::Format_RGB888); //ç®€å•åœ°æ¢ä¸€ä¸‹ä¸ºImageå¯¹è±¡ï¼ŒrgbSwappedæ˜¯ä¸ºäº†æ˜¾ç¤ºæ•ˆæžœè‰²å½©å¥½ä¸€äº›ã€‚
+#if 0
+		image.scaled(ui->label->size(), Qt::KeepAspectRatio);
+		ui->label->setScaledContents(true);
+		ui->label->setPixmap(QPixmap::fromImage(image));
+#endif
+		
+
+	cv::Mat image_tmp1=QImage_to_cvMat(image,true);
+	cv::Mat image_tmp2= face_detect(image_tmp1);
+	QImage image_show=Mat2QImage(image_tmp2);
+
+	image_show.scaled(ui->label->size(), Qt::KeepAspectRatio);
+	ui->label->setScaledContents(true);
+	ui->label->setPixmap(QPixmap::fromImage(image_show));
+
 	return 0;
 }
 
@@ -354,7 +445,7 @@ int MainWindow::convert_yuv_to_rgb_pixel(int y, int u, int v)    /*yuvæ ¼å¼è½¬æ
      return pixel32;
 }
 
-int MainWindow::convert_yuv_to_rgb_buffer(unsigned char *yuv, unsigned char *rgb, unsigned int width,unsigned int height)
+QImage MainWindow::convert_yuv_to_rgb_buffer(unsigned char *yuv, unsigned char *rgb, unsigned int width,unsigned int height)
 {
      unsigned int in, out = 0;
      unsigned int pixel_16;
@@ -388,13 +479,126 @@ int MainWindow::convert_yuv_to_rgb_buffer(unsigned char *yuv, unsigned char *rgb
        rgb[out++] = pixel_24[1];
        rgb[out++] = pixel_24[2];
      }
+	 
 	QImage image = QImage(rgb, width,height, QImage::Format_RGB888); //ç®€å•åœ°æ¢ä¸€ä¸‹ä¸ºImageå¯¹è±¡ï¼ŒrgbSwappedæ˜¯ä¸ºäº†æ˜¾ç¤ºæ•ˆæžœè‰²å½©å¥½ä¸€äº›ã€‚
-	image.scaled(ui->label->size(), Qt::KeepAspectRatio);
-	ui->label->setScaledContents(true);
-	ui->label->setPixmap(QPixmap::fromImage(image));
-     return 0;
+
+
+    return  image;
+	
+//	image.scaled(ui->label->size(), Qt::KeepAspectRatio);
+//	ui->label->setScaledContents(true);
+//	ui->label->setPixmap(QPixmap::fromImage(image));
+
+}
+
+
+int MainWindow::init_Classifier()
+{	
+	if (!eye_Classifier.load("/home/root/haarcascade_eye.xml"))  
+	{
+		cout << "Load haarcascade_eye.xml failed!" << endl;
+		return -1;
+	}
+	
+	if (!face_cascade.load("/home/root/haarcascade_frontalface_alt.xml"))
+	{
+		cout << "Load haarcascade_frontalface_alt failed!" << endl;
+		return -1;
+	}
+	return 0;
+}
+
+cv::Mat  MainWindow::face_detect(cv::Mat image)
+{
+
+#ifdef DETECT_EYS
+	vector<Rect> eyeRect;		
+#endif
+
+#ifdef DETECT_FACE
+	vector<Rect> faceRect;
+#endif
+
+//	Mat image_gray;
+//	Mat mat;	
+
+
+	cv::Mat  image_gray;      //¶¨ÒåÁ½¸öMat±äÁ¿£¬ÓÃÓÚ´æ´¢Ã¿Ò»Ö¡µÄÍ¼Ïñ
+
+//	image = imread("F://1.png");
+
+	cvtColor(image, image_gray, CV_BGR2GRAY);//×ªÎª»Ò¶ÈÍ¼
+	equalizeHist(image_gray, image_gray);//Ö±·½Í¼¾ùºâ»¯£¬Ôö¼Ó¶Ô±È¶È·½±ã´¦Àí
+
+//	cvtColor(&mat, image_gray, CV_BGR2GRAY);  
+//	equalizeHist(image_gray, image_gray);
+
+
+
+#ifdef DETECT_EYS
+       //¼ì²â¹ØÓÚÑÛ¾¦²¿Î»Î»ÖÃ
+       eye_Classifier.detectMultiScale(image_gray, eyeRect, 1.1, 2, 0 | CV_HAAR_SCALE_IMAGE, Size(30, 30));
+       for (size_t eyeIdx = 0; eyeIdx < eyeRect.size(); eyeIdx++)
+       {
+           rectangle(image, eyeRect[eyeIdx], Scalar(0, 0, 255));   //ÓÃ¾ØÐÎ»­³ö¼ì²âµ½µÄÎ»ÖÃ
+       }
+#endif
+
+
+#ifdef DETECT_FACE
+       //¼ì²â¹ØÓÚÁ³²¿Î»ÖÃ
+       face_cascade.detectMultiScale(image_gray, faceRect, 1.1, 2, 0 | CV_HAAR_SCALE_IMAGE, Size(30, 30));
+       for (size_t i = 0; i < faceRect.size(); i++)
+       {
+           rectangle(image, faceRect[i], Scalar(0, 0, 255));      //ÓÃ¾ØÐÎ»­³ö¼ì²âµ½µÄÎ»ÖÃ
+       }
+#endif
+
+	return image;
+
 }
 
 
 
+//cv::Mat QImage2cvMat(QImage image)
+//{
+//    cv::Mat mat;
+//    qDebug() << image.format();
+//    switch(image.format())
+//    {
+//    case QImage::Format_ARGB32:
+//    case QImage::Format_RGB32:
+//    case QImage::Format_ARGB32_Premultiplied:
+//        mat = cv::Mat(image.height(), image.width(), CV_8UC4, (void*)image.constBits(), image.bytesPerLine());
+//        break;
+//    case QImage::Format_RGB888:
+//        mat = cv::Mat(image.height(), image.width(), CV_8UC3, (void*)image.constBits(), image.bytesPerLine());
+//        cv::cvtColor(mat, mat, CV_BGR2RGB);
+//        break;
+//    case QImage::Format_Indexed8:
+//        mat = cv::Mat(image.height(), image.width(), CV_8UC1, (void*)image.constBits(), image.bytesPerLine());
+//        break;
+//    }
+//    return mat;
+//}
 
+//Mat QImage2cvMat(QImage image)
+//{
+//    cv::Mat mat;
+//    switch(image.format())
+//    {
+//    case QImage::Format_ARGB32:
+//    case QImage::Format_RGB32:
+//    case QImage::Format_ARGB32_Premultiplied:
+//        mat = cv::Mat(image.height(), image.width(), CV_8UC4, (void*)image.bits(), image.bytesPerLine());
+//        break;
+//    case QImage::Format_RGB888:
+//        mat = cv::Mat(image.height(), image.width(), CV_8UC3, (void*)image.bits(), image.bytesPerLine());
+//        cv::cvtColor(mat, mat, CV_BGR2RGB);
+//        break;
+//    case QImage::Format_Indexed8:
+//        mat = cv::Mat(image.height(), image.width(), CV_8UC1, (void*)image.bits(), image.bytesPerLine());
+//        break;
+//    }
+//    return mat;
+//}

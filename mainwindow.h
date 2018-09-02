@@ -21,15 +21,45 @@
 #include <asm/types.h>
 #include <linux/videodev2.h>
 
-#include<QImage>
-#include<QDebug>
-#include<QTimer>
+#include <QImage>
+#include <QDebug>
+#include <QTimer>
+#include <QImageReader>
 
+
+#include <iostream>
+
+#include <opencv2/opencv.hpp>
+#include <opencv2/calib3d/calib3d.hpp>
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+//#include <objdetect/objdetect.hpp>
+#include <opencv/cv.h>
+#include <opencv/highgui.h>
+
+
+
+
+using namespace std;
+using namespace cv;
+
+
+
+#define DETECT_FACE  1
+//#define DETECT_EYE  1
+
+
+#define CAMERA_DEVICE "/dev/video1"
 
 #define NB_BUFFER           4
 #define HEADERFRAME1     0xaf
 #define VIDEO_FORMAT     V4L2_PIX_FMT_YUYV
 #define BUFFER_COUNT     1
+
+
+#define  WIDTH    800
+#define  HEIGHT   600
 
 
 
@@ -109,7 +139,7 @@ public:
 
 
 /* convert */
-	int convert_yuv_to_rgb_buffer(unsigned char *yuv, unsigned char *rgb, unsigned int width,unsigned int height);
+	QImage convert_yuv_to_rgb_buffer(unsigned char *yuv, unsigned char *rgb, unsigned int width,unsigned int height);
 	int convert_yuv_to_rgb_pixel(int y, int u, int v);
 
 
@@ -123,6 +153,17 @@ public:
 	VideoBuffer framebuf1[BUFFER_COUNT];
 	QTimer* time1;
 	QImage *frame;
+
+
+
+	/* opencv */
+	int init_Classifier();
+	cv::Mat face_detect(cv::Mat image);
+
+	
+
+	CascadeClassifier  eye_Classifier; 
+	CascadeClassifier  face_cascade;
 
 public slots:
 //     int disaply_image();
