@@ -11,7 +11,9 @@ SUBDIRS += \
     mxnet \
     mxinfo \
     mxsupport \
-    mxtaskmanager
+    mxtaskmanager \
+    sqlite3 \
+    mxcamera
 
 
 TRANSLATIONS += \

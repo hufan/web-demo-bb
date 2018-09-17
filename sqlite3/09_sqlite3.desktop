@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Sqlite3
+Name[zh_TW]=数据库
+Name[zh_CN]=数据库
+
+Type=Application
+Icon=/usr/share/pixmaps/can192.png
+Exec=/home/myir/sqlite3 --platform linuxfb
+Terminal=false
+MimeType=application/x-directory;inode/directory;
+Categories=System;FileTools;Utility;Qt;FileManager;
