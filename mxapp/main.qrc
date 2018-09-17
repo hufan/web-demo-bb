@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>res/images/myir/chinese_wvga.png</file>
+        <file>res/images/myir/english_wvga.png</file>
+    </qresource>
+</RCC>

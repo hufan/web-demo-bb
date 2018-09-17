@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>res/support-ch.png</file>
+        <file>res/support-en.png</file>
+    </qresource>
+</RCC>
