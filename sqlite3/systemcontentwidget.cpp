@@ -48,15 +48,15 @@ SystemContentWidget::SystemContentWidget(QWidget *parent, MxApplication *obj, in
     palette.setBrush(QPalette::Window, QBrush(Qt::white));
     this->setPalette(palette);
 
-    /*init  time */
-//    testTimer = new QTimer(this);
-//    connect( testTimer, SIGNAL(timeout()),this, SLOT(timerDone()) );
-//    testTimer->start( 100 );
+
+    sql_test=new sqlite3_base();
+    sql_test->sqlite3_base_open("/home/myir/MYIR_RHMI.db");
+//    sql_test->sqlite3_base_create_tab();
+
 }
 SystemContentWidget::~SystemContentWidget()
 {
    // m_mxde->callCloseSerialPort(m_serial_fd);
-
 }
 
 int SystemContentWidget::init_sqlite()
@@ -64,10 +64,76 @@ int SystemContentWidget::init_sqlite()
     model=new QStandardItemModel();
     m_tableview->setModel(model);
 
+
+}
+void SystemContentWidget::initUI()
+{
+    mainLayout = new QGridLayout();
+
+    m_Grbox_Group = new QGroupBox("Sqlite3");
+    m_Grbox_Layout = new QGridLayout(m_Grbox_Group);
+
+    m_insert_Button = new QPushButton();
+    m_insert_Button->setObjectName("sqlite3_insert");
+    m_insert_Button->setText(tr("insert"));
+//     m_insert_Button->setMinimumSize(10,10);
+
+    m_delete_Button = new QPushButton();
+    m_delete_Button->setObjectName("sqlite3_delet");
+    m_delete_Button->setText(tr("delet"));
+//    m_delete_Button->setMinimumSize(10,10);
+
+    m_update_Button = new QPushButton();
+    m_update_Button->setObjectName("sqlite3_update");
+    m_update_Button->setText(tr("udate"));
+//    m_update_Button->setMinimumSize(30,30);
+
+    m_tableview = new QTableView();
+    m_tableview->setObjectName("sqlite3_tableview");
+
+    QHBoxLayout *hLayout1 = new QHBoxLayout(m_Grbox_Group);
+    hLayout1->setContentsMargins(40,10,40,10);
+//    hLayout1->setMargin(40);
+    hLayout1->setSpacing(120);
+//    hLayout1->addStretch();
+    hLayout1->addWidget(m_insert_Button);
+//    hLayout1->addStretch();
+    hLayout1->addWidget(m_delete_Button);
+//    hLayout1->addStretch();
+    hLayout1->addWidget(m_update_Button);
+//    hLayout1->addStretch();
+
+    QHBoxLayout *hLayout2 = new QHBoxLayout(m_Grbox_Group);
+    hLayout2->addWidget(m_tableview);
+
+//     QGridLayout *grid = new QGridLayout();
+    m_Grbox_Layout->addLayout(hLayout1,0,0,1,10);
+    m_Grbox_Layout->addLayout(hLayout2,1,0,1,10);
+    m_Grbox_Group->setLayout(m_Grbox_Layout);
+    mainLayout->addWidget(m_Grbox_Group, 0,0);
+    this->setLayout(mainLayout);
+
+    connect(m_insert_Button, SIGNAL(clicked()), this, SLOT(clickInsertData_sqlite()));
+    connect(m_delete_Button, SIGNAL(clicked()), this, SLOT(clickDeleteData_sqlite()));
+    connect(m_tableview,SIGNAL(clicked(QModelIndex)),this,SLOT( get_id_sqlite() ));  /*tableview Select*/
+
+/* init sqlite3 */
+    init_sqlite();
+    display();
+}
+
+void SystemContentWidget::initConnection()
+{
+
+}
+
+void SystemContentWidget::display()
+{
+
     char **arr_sqldata;
-    sql_test=new sqlite3_base();
-    sql_test->sqlite3_base_open("/home/myir/RHMI.db");
-    sql_test->sqlite3_base_create_tab();
+//    sql_test=new sqlite3_base();
+//    sql_test->sqlite3_base_open("/home/myir/MYIR_RHMI.db");
+//    sql_test->sqlite3_base_create_tab();
 //    sql_test->sqlite3_base_insert_data();
     arr_sqldata=sql_test->sqlite3_base_read_data();
 
@@ -94,70 +160,30 @@ int SystemContentWidget::init_sqlite()
     //    QList<QStandardItem*> items;
     //    items << item1 << item2 << item3;
     //    model->appendRow(items);
-
-}
-void SystemContentWidget::initUI()
-{
-
-    mainLayout = new QGridLayout();
-
-    m_Grbox_Group = new QGroupBox("Sqlite3");
-    m_Grbox_Layout = new QGridLayout(m_Grbox_Group);
-
-    m_insert_Button = new QPushButton();
-    m_insert_Button->setObjectName("sqlite3_insert");
-    m_insert_Button->setText(tr("insert"));
-//     m_insert_Button->setMinimumSize(10,10);
-
-    m_delete_Button = new QPushButton();
-    m_delete_Button->setObjectName("sqlite3_delet");
-    m_delete_Button->setText(tr("delet"));
-//    m_delete_Button->setMinimumSize(10,10);
-
-    m_update_Button = new QPushButton();
-    m_update_Button->setObjectName("sqlite3_update");
-    m_update_Button->setText(tr("udate"));
-//    m_update_Button->setMinimumSize(30,30);
-
-
-    m_tableview = new QTableView();
-    m_tableview->setObjectName("sqlite3_tableview");
-
-    QHBoxLayout *hLayout1 = new QHBoxLayout(m_Grbox_Group);
-    hLayout1->setContentsMargins(40,10,40,10);
-//    hLayout1->setMargin(40);
-    hLayout1->setSpacing(120);
-//    hLayout1->addStretch();
-    hLayout1->addWidget(m_insert_Button);
-//    hLayout1->addStretch();
-    hLayout1->addWidget(m_delete_Button);
-//    hLayout1->addStretch();
-    hLayout1->addWidget(m_update_Button);
-//    hLayout1->addStretch();
-
-    QHBoxLayout *hLayout2 = new QHBoxLayout(m_Grbox_Group);
-    hLayout2->addWidget(m_tableview);
-
-//     QGridLayout *grid = new QGridLayout();
-
-    m_Grbox_Layout->addLayout(hLayout1,0,0,1,10);
-    m_Grbox_Layout->addLayout(hLayout2,1,0,1,10);
-    m_Grbox_Group->setLayout(m_Grbox_Layout);
-    mainLayout->addWidget(m_Grbox_Group, 0,0);
-    this->setLayout(mainLayout);
-
-/* init sqlite3 */
-    init_sqlite();
 }
 
-void SystemContentWidget::initConnection()
+int SystemContentWidget::clickInsertData_sqlite()
 {
-
+    sql_test->sqlite3_base_insert_data();
+    display();
 }
-
-void SystemContentWidget::display()
+int SystemContentWidget::clickDeleteData_sqlite()
 {
 
+    sql_test->sqlite3_base_delete_data(get_id_sqlite());
+    sleep(2);
+    display();
+}
+int SystemContentWidget::get_id_sqlite()
+{
+        int curRow=m_tableview->currentIndex().row();//选中行
+
+        QAbstractItemModel *modessl = m_tableview->model();
+          QModelIndex indextemp = modessl->index(curRow,0);//遍历第一行的0列
+    //    //这个是一个单元格的值。tostring()----ok
+        QVariant datatemp = modessl->data(indextemp);
+
+        return  datatemp.toInt();
 }
 void SystemContentWidget::setApplication(MxApplication *app)
 {

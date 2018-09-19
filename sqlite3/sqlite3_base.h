@@ -3,6 +3,9 @@
 
 #include "sqlite3.h"
 
+#include <QTextStream>
+#include <QDateTime>
+
 class sqlite3_base
 {
 public:
@@ -16,6 +19,7 @@ public:
     int sqlite3_base_insert_data();
     char** sqlite3_base_read_data();
     int sqlite3_base_close();
+    int sqlite3_base_delete_data(int id);
 };
 
 #endif // SQLITE3_BASE_H
