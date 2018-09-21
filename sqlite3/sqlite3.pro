@@ -9,7 +9,7 @@ CONFIG -= app_bundle
 
 TEMPLATE = app
 
-target.path = /home/sunny
+target.path = /home/myir
 INSTALLS += target
 
 SOURCES += main.cpp \

@@ -22,7 +22,7 @@
 #include <QLineEdit>
 #include <QComboBox>
 #include <QGridLayout>
-
+#include <QHeaderView>
 
 #include "systemcontentwidget.h"
 //#include "mxde.h"
@@ -31,7 +31,6 @@
 SystemContentWidget::SystemContentWidget(QWidget *parent, MxApplication *obj, int width , int height )
             :BaseWidget(parent,obj)
 {
-
     m_width = width;
     if(m_width <=0){
         m_width = DEFAULT_SCREEN_WIDTH;
@@ -47,7 +46,6 @@ SystemContentWidget::SystemContentWidget(QWidget *parent, MxApplication *obj, in
     QPalette palette;
     palette.setBrush(QPalette::Window, QBrush(Qt::white));
     this->setPalette(palette);
-
 
     sql_test=new sqlite3_base();
     sql_test->sqlite3_base_open("/home/myir/MYIR_RHMI.db");
@@ -75,21 +73,27 @@ void SystemContentWidget::initUI()
 
     m_insert_Button = new QPushButton();
     m_insert_Button->setObjectName("sqlite3_insert");
-    m_insert_Button->setText(tr("insert"));
+    m_insert_Button->setText(tr("Insert"));
 //     m_insert_Button->setMinimumSize(10,10);
 
     m_delete_Button = new QPushButton();
     m_delete_Button->setObjectName("sqlite3_delet");
-    m_delete_Button->setText(tr("delet"));
+    m_delete_Button->setText(tr("Delete"));
 //    m_delete_Button->setMinimumSize(10,10);
 
     m_update_Button = new QPushButton();
     m_update_Button->setObjectName("sqlite3_update");
-    m_update_Button->setText(tr("udate"));
+    m_update_Button->setText(tr("Update"));
 //    m_update_Button->setMinimumSize(30,30);
 
     m_tableview = new QTableView();
     m_tableview->setObjectName("sqlite3_tableview");
+
+//    resizeRowsToContents();
+
+    m_tableview->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    //m_tableview->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+
 
     QHBoxLayout *hLayout1 = new QHBoxLayout(m_Grbox_Group);
     hLayout1->setContentsMargins(40,10,40,10);
@@ -115,6 +119,7 @@ void SystemContentWidget::initUI()
 
     connect(m_insert_Button, SIGNAL(clicked()), this, SLOT(clickInsertData_sqlite()));
     connect(m_delete_Button, SIGNAL(clicked()), this, SLOT(clickDeleteData_sqlite()));
+    connect(m_update_Button, SIGNAL(clicked()), this, SLOT(clickupdateData_sqlite()));
     connect(m_tableview,SIGNAL(clicked(QModelIndex)),this,SLOT( get_id_sqlite() ));  /*tableview Select*/
 
 /* init sqlite3 */
@@ -129,8 +134,8 @@ void SystemContentWidget::initConnection()
 
 void SystemContentWidget::display()
 {
-
     char **arr_sqldata;
+
 //    sql_test=new sqlite3_base();
 //    sql_test->sqlite3_base_open("/home/myir/MYIR_RHMI.db");
 //    sql_test->sqlite3_base_create_tab();
@@ -148,15 +153,12 @@ void SystemContentWidget::display()
         for(int i=0;i<sql_test->sqlread_nrow;i++){
             for(int j=0;j<sql_test->sqlread_ncolumn;j++){
                 model->setItem(i,j,new QStandardItem(arr_sqldata[sql_test->sqlread_ncolumn*i+j+sql_test->sqlread_ncolumn]));
-    //            qDebug()<<"hufan i  ---"<<i<<"data"<<arr_sqldata[sql_test->sqlread_ncolumn*i+j+sql_test->sqlread_ncolumn]<<endl;
             }
         }
 
     /*第二种方式显示*/
     //    QStandardItem* item0 = new QStandardItem(tr("小明"));
     //    QStandardItem* item1 = new QStandardItem(tr("男"));
-    //    QStandardItem* item2 = new QStandardItem(tr("20"));
-    //    QStandardItem* item3 = new QStandardItem(tr("180"));
     //    QList<QStandardItem*> items;
     //    items << item1 << item2 << item3;
     //    model->appendRow(items);
@@ -167,23 +169,28 @@ int SystemContentWidget::clickInsertData_sqlite()
     sql_test->sqlite3_base_insert_data();
     display();
 }
+int SystemContentWidget::clickupdateData_sqlite()
+{
+    /*clear tableview*/
+     model->clear();
+     m_tableview->reset();
+     display();
+}
 int SystemContentWidget::clickDeleteData_sqlite()
 {
-
     sql_test->sqlite3_base_delete_data(get_id_sqlite());
-    sleep(2);
+    model->clear();
+    m_tableview->reset();
     display();
 }
 int SystemContentWidget::get_id_sqlite()
 {
-        int curRow=m_tableview->currentIndex().row();//选中行
-
-        QAbstractItemModel *modessl = m_tableview->model();
-          QModelIndex indextemp = modessl->index(curRow,0);//遍历第一行的0列
-    //    //这个是一个单元格的值。tostring()----ok
-        QVariant datatemp = modessl->data(indextemp);
-
-        return  datatemp.toInt();
+    int curRow=m_tableview->currentIndex().row();//选中行
+    QAbstractItemModel *modessl = m_tableview->model();
+    QModelIndex indextemp = modessl->index(curRow,0);//遍历第一行的0列
+    //这个是一个单元格的值。tostring()----ok
+    QVariant datatemp = modessl->data(indextemp);
+    return  datatemp.toInt();
 }
 void SystemContentWidget::setApplication(MxApplication *app)
 {

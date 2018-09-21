@@ -90,6 +90,7 @@ public slots:
 //    void timerDone();
     int clickInsertData_sqlite();
     int clickDeleteData_sqlite();
+    int clickupdateData_sqlite();
     int get_id_sqlite();
 
 private:
