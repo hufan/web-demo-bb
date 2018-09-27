@@ -19,6 +19,21 @@
 #include <QTableView>
 #include <QPushButton>
 
+#include <QWidget>
+#include <QPushButton>
+#include <QLabel>
+#include <QHBoxLayout>
+#include <QGroupBox>
+#include <QVBoxLayout>
+#include <QList>
+#include <QTextEdit>
+#include <QComboBox>
+#include <QLabel>
+#include <QLineEdit>
+#include <QComboBox>
+#include <QGridLayout>
+#include <QHeaderView>
+
 #include "mxapplication.h"
 #include "basewidget.h"
 
@@ -148,6 +163,8 @@ public:
 
 public slots:
     void timerDone();
+    int clickInsertData_sqlite();
+//    int clickDeleteData_sqlite();
 
 private:
     QWidget                 *m_parent;
@@ -157,9 +174,23 @@ private:
 
     QStringList          infoList;
     QLabel               *m_show_pic;
+//    QGroupBox            *m_Grbox_Group;
+//    QGridLayout          *m_Grbox_Layout;
+//    QGridLayout          *mainLayout;
+
+
+
+    QPushButton          *m_insert_Button;
+    QPushButton          *m_delete_Button;
+    QPushButton          *m_update_Button;
+
     QGroupBox            *m_Grbox_Group;
+    QGroupBox            *m_Grbox_Group2;
     QGridLayout          *m_Grbox_Layout;
     QGridLayout          *mainLayout;
+
+    QTableView           *m_tableview;
+	
 };
 
 #endif // SYSTEMCONTENTWIDGET_H

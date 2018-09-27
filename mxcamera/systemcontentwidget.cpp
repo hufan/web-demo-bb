@@ -17,6 +17,8 @@
 //#include <QTimer>
 #include <iostream>
 
+#include <qpainter.h>
+
 #include "systemcontentwidget.h"
 #include "constant.h"
 #include "mxapplication.h"
@@ -44,9 +46,9 @@ SystemContentWidget::SystemContentWidget(QWidget *parent, MxApplication *obj, in
 //    init_v4l2();
 
     /*init camera  and time */
-    testTimer = new QTimer(this);
-    connect( testTimer, SIGNAL(timeout()),this, SLOT(timerDone()) );
-    testTimer->start( 100 );
+//    testTimer = new QTimer(this);
+//    connect( testTimer, SIGNAL(timeout()),this, SLOT(timerDone()) );
+//    testTimer->start( 100 );
 
 }
 SystemContentWidget::~SystemContentWidget()
@@ -59,6 +61,8 @@ int SystemContentWidget::init_v4l2(){
 
             int i,ret;
             /*init v4l2*/
+	    QTextStream out(stdout);
+//    out << "The current datetime is 111111111111" << << endl;
             int width=800,height=600;
 
             cd.format = V4L2_PIX_FMT_YUYV;
@@ -93,6 +97,7 @@ int SystemContentWidget::init_v4l2(){
                      exit(1);
            }
 
+           out << "The current datetime is 111111111111" << endl;
            memset(&cd.videoIn.cap, 0, sizeof(struct v4l2_capability));
            ret = ioctl(cd.videoIn.fd, VIDIOC_QUERYCAP, &cd.videoIn.cap);
            if (ret < 0) {
@@ -116,6 +121,7 @@ int SystemContentWidget::init_v4l2(){
              }
            }
 
+           out << "The current datetime is 222222222222222222222222" <<  endl;
           /*
            * set format in
            */
@@ -167,6 +173,7 @@ int SystemContentWidget::init_v4l2(){
             printf("Unable to allocate buffers: %d.\n", errno);
             goto error;
           }
+           out << "The current datetime is 3333333333333333333333333333" <<  endl;
           /*
            * map the buffers
            */
@@ -193,6 +200,7 @@ int SystemContentWidget::init_v4l2(){
             //	  printf("Buffer mapped at address %p.\n", mem[i]);
 
           }
+           out << "The current datetime is 44444444444444444444444" <<  endl;
           /*
            * Queue the buffers.
            */
@@ -230,6 +238,7 @@ int SystemContentWidget::init_v4l2(){
                   framebuffer = (unsigned char *) malloc((size_t) cd.videoIn.framesizeIn);
                   tmpbuffer = (unsigned char *) calloc(1, (size_t) cd.videoIn.framesizeIn);
     //			  tmpbuffer = (unsigned char *) malloc((size_t) cd.videoIn.framesizeIn);
+           out << "The current datetime is 555555555555555555555555555555555" << endl;
               break;
             default:
               printf("Unknown format: should never arrive exit fatal !!\n");
@@ -343,7 +352,7 @@ int SystemContentWidget::update_video(){
     if (!cd.videoIn.isstreaming) {
         if (v4l2_enbale()){
             //            goto err;
-            return 0-1;
+            return -1;
         }
     }
 
@@ -413,30 +422,85 @@ void SystemContentWidget::timerDone(){
 
 void SystemContentWidget::initUI()
 {
-    mainLayout = new QGridLayout();
+//    mainLayout = new QGridLayout();
 
-    m_Grbox_Group = new QGroupBox("Camera preview");
+//    m_Grbox_Group = new QGroupBox("Camera preview");
+//    m_Grbox_Layout = new QGridLayout(m_Grbox_Group);
+
+//    m_show_pic = new QLabel(m_Grbox_Group);
+//    m_show_pic->setText(tr("camera show "));
+
+//    QHBoxLayout *hLayout1 = new QHBoxLayout(m_Grbox_Group);
+////    hLayout1->setContentsMargins(40,10,40,10);
+////    hLayout1->setSpacing(120);
+//    hLayout1->addWidget(m_show_pic);
+
+//    m_Grbox_Layout->addLayout(hLayout1,0,0,1,10);
+//    m_Grbox_Group->setLayout(m_Grbox_Layout);
+//    mainLayout->addWidget(m_Grbox_Group, 0,0);
+//    this->setLayout(mainLayout);
+
+//    /*init*/
+//    init_v4l2();
+
+//    /*init camera  and time */
+//    testTimer = new QTimer(this);
+//    connect( testTimer, SIGNAL(timeout()),this, SLOT(timerDone()) );
+//    testTimer->start( 100 );
+
+
+    mainLayout = new QGridLayout();
+    m_Grbox_Group = new QGroupBox("Camera");
     m_Grbox_Layout = new QGridLayout(m_Grbox_Group);
 
+    m_insert_Button = new QPushButton();
+    m_insert_Button->setObjectName("serialButton");
+    m_insert_Button->setText(tr("Photograph"));
+//     m_insert_Button->setMinimumSize(10,10);
+
     m_show_pic = new QLabel(m_Grbox_Group);
-    m_show_pic->setText(tr("camera show "));
+    m_show_pic->setText(tr("photo show "));
+
+    m_delete_Button = new QPushButton();
+//    m_delete_Button->setObjectName("sqlite3_delet");
+     m_delete_Button->setObjectName("serialButton");
+    m_delete_Button->setText(tr("Save"));
 
     QHBoxLayout *hLayout1 = new QHBoxLayout(m_Grbox_Group);
-//    hLayout1->setContentsMargins(40,10,40,10);
-//    hLayout1->setSpacing(120);
-    hLayout1->addWidget(m_show_pic);
+//    hLayout1->setContentsMargins(5,5,5,5);
+//    hLayout1->setMargin(40);
+    hLayout1->setSpacing(120);
+    hLayout1->addStretch();
+    hLayout1->addWidget(m_insert_Button);
+    hLayout1->addStretch();
+    hLayout1->addWidget(m_delete_Button);
+    // hLayout1->addWidget(m_update_Button);
+    hLayout1->addStretch();
 
+    QHBoxLayout *hLayout2 = new QHBoxLayout(m_Grbox_Group);
+    hLayout2->addWidget(m_show_pic);
+
+//     QGridLayout *grid = new QGridLayout();
     m_Grbox_Layout->addLayout(hLayout1,0,0,1,10);
+    m_Grbox_Layout->addLayout(hLayout2,1,0,1,10);
     m_Grbox_Group->setLayout(m_Grbox_Layout);
     mainLayout->addWidget(m_Grbox_Group, 0,0);
     this->setLayout(mainLayout);
 
+    connect(m_insert_Button, SIGNAL(clicked()), this, SLOT(clickInsertData_sqlite()));
+//    connect(m_delete_Button, SIGNAL(clicked()), this, SLOT(clickDeleteData_sqlite()));
 
-
-    /*init*/
-    init_v4l2();
 }
+int SystemContentWidget::clickInsertData_sqlite()
+{
 
+QImage image;
+image.load("/home/root/HH.jpg");
+image.scaled(m_show_pic->size(), Qt::KeepAspectRatio);
+m_show_pic->setScaledContents(true);
+m_show_pic->setPixmap(QPixmap::fromImage(image));
+
+}
 void SystemContentWidget::initConnection()
 {
 

@@ -123,6 +123,6 @@ void SystemActionWidget::display()
 void SystemActionWidget::setCurrentLanguage(QString &lang)
 {
     qDebug() << "SystemActionWidget setCurrentLanguage :" << lang << endl;
-    title_myir_label->setText(tr("System Info"));
+    title_myir_label->setText(tr("Camera Test"));
 }
 
