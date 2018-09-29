@@ -36,7 +36,7 @@ DISTNAME      = mxcamera1.0.0
 DISTDIR = /home/alex/workspace/qt5_demo/new_demo_qt5/web-demo-bb/mxcamera/.tmp/mxcamera1.0.0
 LINK          = $(OE_QMAKE_LINK)
 LFLAGS        = $(OE_QMAKE_LDFLAGS) -Wl,-O1
-LIBS          = $(SUBLIBS) -lv4lconvert -lQt5Widgets -lQt5Gui -lQt5DBus -lQt5Network -lQt5Sql -lQt5Core -lGLESv2 -lEGL -lpthread 
+LIBS          = $(SUBLIBS) -lv4lconvert -ljpeg -lv4l2 -lQt5Widgets -lQt5Gui -lQt5DBus -lQt5Network -lQt5Sql -lQt5Core -lGLESv2 -lEGL -lpthread 
 AR            = $(OE_QMAKE_AR) cqs
 RANLIB        = 
 SED           = sed
@@ -52,6 +52,7 @@ SOURCES       = main.cpp \
 		mxmaindialog.cpp \
 		systemactionwidget.cpp \
 		systemcontentwidget.cpp \
+		v4l2_camera.cpp \
 		../qtsingleapplication/src/qtsingleapplication.cpp \
 		../qtsingleapplication/src/qtlocalpeer.cpp \
 		../mxbase/common/systembutton.cpp \
@@ -78,6 +79,7 @@ OBJECTS       = main.o \
 		mxmaindialog.o \
 		systemactionwidget.o \
 		systemcontentwidget.o \
+		v4l2_camera.o \
 		qtsingleapplication.o \
 		qtlocalpeer.o \
 		systembutton.o \
@@ -253,6 +255,7 @@ DIST          = res/hardware/audio.png \
 		mxcamera.pro mxmaindialog.h \
 		systemactionwidget.h \
 		systemcontentwidget.h \
+		v4l2_camera.h \
 		../qtsingleapplication/src/qtsingleapplication.h \
 		../qtsingleapplication/src/qtlocalpeer.h \
 		../mxbase/common/systembutton.h \
@@ -267,6 +270,7 @@ DIST          = res/hardware/audio.png \
 		mxmaindialog.cpp \
 		systemactionwidget.cpp \
 		systemcontentwidget.cpp \
+		v4l2_camera.cpp \
 		../qtsingleapplication/src/qtsingleapplication.cpp \
 		../qtsingleapplication/src/qtlocalpeer.cpp \
 		../mxbase/common/systembutton.cpp \
@@ -590,8 +594,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents ../mxbase/mxbase.qrc img.qrc $(DISTDIR)/
-	$(COPY_FILE) --parents mxmaindialog.h systemactionwidget.h systemcontentwidget.h ../qtsingleapplication/src/qtsingleapplication.h ../qtsingleapplication/src/qtlocalpeer.h ../mxbase/common/systembutton.h ../mxbase/common/constant.h ../mxbase/common/mxdesktopfile.h ../mxbase/common/mxlistmodel.h ../mxbase/common/mxproperties.h ../mxbase/virtualkeyboard/frminput.h ../mxbase/widgets/basewidget.h ../mxbase/widgets/shadowwidget.h ../mxbase/application/mxapplication.h $(DISTDIR)/
-	$(COPY_FILE) --parents main.cpp mxmaindialog.cpp systemactionwidget.cpp systemcontentwidget.cpp ../qtsingleapplication/src/qtsingleapplication.cpp ../qtsingleapplication/src/qtlocalpeer.cpp ../mxbase/common/systembutton.cpp ../mxbase/common/mxdesktopfile.cpp ../mxbase/common/mxlistmodel.cpp ../mxbase/common/mxproperties.cpp ../mxbase/virtualkeyboard/frminput.cpp ../mxbase/widgets/basewidget.cpp ../mxbase/widgets/shadowwidget.cpp ../mxbase/application/mxapplication.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents mxmaindialog.h systemactionwidget.h systemcontentwidget.h v4l2_camera.h ../qtsingleapplication/src/qtsingleapplication.h ../qtsingleapplication/src/qtlocalpeer.h ../mxbase/common/systembutton.h ../mxbase/common/constant.h ../mxbase/common/mxdesktopfile.h ../mxbase/common/mxlistmodel.h ../mxbase/common/mxproperties.h ../mxbase/virtualkeyboard/frminput.h ../mxbase/widgets/basewidget.h ../mxbase/widgets/shadowwidget.h ../mxbase/application/mxapplication.h $(DISTDIR)/
+	$(COPY_FILE) --parents main.cpp mxmaindialog.cpp systemactionwidget.cpp systemcontentwidget.cpp v4l2_camera.cpp ../qtsingleapplication/src/qtsingleapplication.cpp ../qtsingleapplication/src/qtlocalpeer.cpp ../mxbase/common/systembutton.cpp ../mxbase/common/mxdesktopfile.cpp ../mxbase/common/mxlistmodel.cpp ../mxbase/common/mxproperties.cpp ../mxbase/virtualkeyboard/frminput.cpp ../mxbase/widgets/basewidget.cpp ../mxbase/widgets/shadowwidget.cpp ../mxbase/application/mxapplication.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents ../mxbase/virtualkeyboard/frminput.ui $(DISTDIR)/
 
 
@@ -657,6 +661,7 @@ moc_mxmaindialog.cpp: ../mxbase/common/constant.h \
 		../mxbase/widgets/basewidget.h \
 		../mxbase/common/systembutton.h \
 		systemcontentwidget.h \
+		v4l2_camera.h \
 		mxmaindialog.h
 	/opt/opencv-qt5/sysroots/x86_64-pokysdk-linux/usr/bin/qt5/moc $(DEFINES) -I/opt/opencv-qt5/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/lib/qt5/mkspecs/linux-oe-g++ -I/home/alex/workspace/qt5_demo/new_demo_qt5/web-demo-bb/mxcamera -I/home/alex/workspace/qt5_demo/new_demo_qt5/web-demo-bb/qtsingleapplication/src -I/home/alex/workspace/qt5_demo/new_demo_qt5/web-demo-bb/mxbase -I/home/alex/workspace/qt5_demo/new_demo_qt5/web-demo-bb/mxbase/common -I/home/alex/workspace/qt5_demo/new_demo_qt5/web-demo-bb/mxbase/widgets -I/home/alex/workspace/qt5_demo/new_demo_qt5/web-demo-bb/mxbase/application -I/home/alex/workspace/qt5_demo/new_demo_qt5/web-demo-bb/mxbase/virtualkeyboard -I/opt/opencv-qt5/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include/qt5 -I/opt/opencv-qt5/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include/qt5/QtWidgets -I/opt/opencv-qt5/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include/qt5/QtGui -I/opt/opencv-qt5/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include/qt5/QtDBus -I/opt/opencv-qt5/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include/qt5/QtNetwork -I/opt/opencv-qt5/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include/qt5/QtSql -I/opt/opencv-qt5/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include/qt5/QtCore -I/opt/opencv-qt5/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include/c++/5.3.0 -I/opt/opencv-qt5/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include/c++/5.3.0/arm-poky-linux-gnueabi -I/opt/opencv-qt5/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include/c++/5.3.0/backward -I/opt/opencv-qt5/sysroots/x86_64-pokysdk-linux/lib/arm-poky-linux-gnueabi/gcc/arm-poky-linux-gnueabi/5.3.0/include -I/opt/opencv-qt5/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/lib/gcc/arm-poky-linux-gnueabi/5.3.0/include -I/opt/opencv-qt5/sysroots/x86_64-pokysdk-linux/lib/arm-poky-linux-gnueabi/gcc/arm-poky-linux-gnueabi/5.3.0/include-fixed -I/opt/opencv-qt5/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include mxmaindialog.h -o moc_mxmaindialog.cpp
 
@@ -666,6 +671,7 @@ moc_systemactionwidget.cpp: ../mxbase/widgets/basewidget.h \
 		../qtsingleapplication/src/qtsingleapplication.h \
 		../mxbase/common/systembutton.h \
 		systemcontentwidget.h \
+		v4l2_camera.h \
 		systemactionwidget.h
 	/opt/opencv-qt5/sysroots/x86_64-pokysdk-linux/usr/bin/qt5/moc $(DEFINES) -I/opt/opencv-qt5/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/lib/qt5/mkspecs/linux-oe-g++ -I/home/alex/workspace/qt5_demo/new_demo_qt5/web-demo-bb/mxcamera -I/home/alex/workspace/qt5_demo/new_demo_qt5/web-demo-bb/qtsingleapplication/src -I/home/alex/workspace/qt5_demo/new_demo_qt5/web-demo-bb/mxbase -I/home/alex/workspace/qt5_demo/new_demo_qt5/web-demo-bb/mxbase/common -I/home/alex/workspace/qt5_demo/new_demo_qt5/web-demo-bb/mxbase/widgets -I/home/alex/workspace/qt5_demo/new_demo_qt5/web-demo-bb/mxbase/application -I/home/alex/workspace/qt5_demo/new_demo_qt5/web-demo-bb/mxbase/virtualkeyboard -I/opt/opencv-qt5/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include/qt5 -I/opt/opencv-qt5/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include/qt5/QtWidgets -I/opt/opencv-qt5/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include/qt5/QtGui -I/opt/opencv-qt5/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include/qt5/QtDBus -I/opt/opencv-qt5/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include/qt5/QtNetwork -I/opt/opencv-qt5/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include/qt5/QtSql -I/opt/opencv-qt5/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include/qt5/QtCore -I/opt/opencv-qt5/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include/c++/5.3.0 -I/opt/opencv-qt5/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include/c++/5.3.0/arm-poky-linux-gnueabi -I/opt/opencv-qt5/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include/c++/5.3.0/backward -I/opt/opencv-qt5/sysroots/x86_64-pokysdk-linux/lib/arm-poky-linux-gnueabi/gcc/arm-poky-linux-gnueabi/5.3.0/include -I/opt/opencv-qt5/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/lib/gcc/arm-poky-linux-gnueabi/5.3.0/include -I/opt/opencv-qt5/sysroots/x86_64-pokysdk-linux/lib/arm-poky-linux-gnueabi/gcc/arm-poky-linux-gnueabi/5.3.0/include-fixed -I/opt/opencv-qt5/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include systemactionwidget.h -o moc_systemactionwidget.cpp
 
@@ -673,6 +679,7 @@ moc_systemcontentwidget.cpp: ../mxbase/application/mxapplication.h \
 		../qtsingleapplication/src/QtSingleApplication \
 		../qtsingleapplication/src/qtsingleapplication.h \
 		../mxbase/widgets/basewidget.h \
+		v4l2_camera.h \
 		systemcontentwidget.h
 	/opt/opencv-qt5/sysroots/x86_64-pokysdk-linux/usr/bin/qt5/moc $(DEFINES) -I/opt/opencv-qt5/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/lib/qt5/mkspecs/linux-oe-g++ -I/home/alex/workspace/qt5_demo/new_demo_qt5/web-demo-bb/mxcamera -I/home/alex/workspace/qt5_demo/new_demo_qt5/web-demo-bb/qtsingleapplication/src -I/home/alex/workspace/qt5_demo/new_demo_qt5/web-demo-bb/mxbase -I/home/alex/workspace/qt5_demo/new_demo_qt5/web-demo-bb/mxbase/common -I/home/alex/workspace/qt5_demo/new_demo_qt5/web-demo-bb/mxbase/widgets -I/home/alex/workspace/qt5_demo/new_demo_qt5/web-demo-bb/mxbase/application -I/home/alex/workspace/qt5_demo/new_demo_qt5/web-demo-bb/mxbase/virtualkeyboard -I/opt/opencv-qt5/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include/qt5 -I/opt/opencv-qt5/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include/qt5/QtWidgets -I/opt/opencv-qt5/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include/qt5/QtGui -I/opt/opencv-qt5/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include/qt5/QtDBus -I/opt/opencv-qt5/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include/qt5/QtNetwork -I/opt/opencv-qt5/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include/qt5/QtSql -I/opt/opencv-qt5/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include/qt5/QtCore -I/opt/opencv-qt5/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include/c++/5.3.0 -I/opt/opencv-qt5/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include/c++/5.3.0/arm-poky-linux-gnueabi -I/opt/opencv-qt5/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include/c++/5.3.0/backward -I/opt/opencv-qt5/sysroots/x86_64-pokysdk-linux/lib/arm-poky-linux-gnueabi/gcc/arm-poky-linux-gnueabi/5.3.0/include -I/opt/opencv-qt5/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/lib/gcc/arm-poky-linux-gnueabi/5.3.0/include -I/opt/opencv-qt5/sysroots/x86_64-pokysdk-linux/lib/arm-poky-linux-gnueabi/gcc/arm-poky-linux-gnueabi/5.3.0/include-fixed -I/opt/opencv-qt5/sysroots/cortexa7hf-neon-poky-linux-gnueabi/usr/include systemcontentwidget.h -o moc_systemcontentwidget.cpp
 
@@ -736,6 +743,7 @@ main.o: main.cpp mxmaindialog.h \
 		../mxbase/widgets/basewidget.h \
 		../mxbase/common/systembutton.h \
 		systemcontentwidget.h \
+		v4l2_camera.h \
 		../mxbase/virtualkeyboard/frminput.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
 
@@ -747,7 +755,8 @@ mxmaindialog.o: mxmaindialog.cpp ../mxbase/common/constant.h \
 		systemactionwidget.h \
 		../mxbase/widgets/basewidget.h \
 		../mxbase/common/systembutton.h \
-		systemcontentwidget.h
+		systemcontentwidget.h \
+		v4l2_camera.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mxmaindialog.o mxmaindialog.cpp
 
 systemactionwidget.o: systemactionwidget.cpp ../mxbase/common/constant.h \
@@ -757,7 +766,8 @@ systemactionwidget.o: systemactionwidget.cpp ../mxbase/common/constant.h \
 		../qtsingleapplication/src/QtSingleApplication \
 		../qtsingleapplication/src/qtsingleapplication.h \
 		../mxbase/common/systembutton.h \
-		systemcontentwidget.h
+		systemcontentwidget.h \
+		v4l2_camera.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o systemactionwidget.o systemactionwidget.cpp
 
 systemcontentwidget.o: systemcontentwidget.cpp systemcontentwidget.h \
@@ -765,8 +775,12 @@ systemcontentwidget.o: systemcontentwidget.cpp systemcontentwidget.h \
 		../qtsingleapplication/src/QtSingleApplication \
 		../qtsingleapplication/src/qtsingleapplication.h \
 		../mxbase/widgets/basewidget.h \
+		v4l2_camera.h \
 		../mxbase/common/constant.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o systemcontentwidget.o systemcontentwidget.cpp
+
+v4l2_camera.o: v4l2_camera.cpp v4l2_camera.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o v4l2_camera.o v4l2_camera.cpp
 
 qtsingleapplication.o: ../qtsingleapplication/src/qtsingleapplication.cpp ../qtsingleapplication/src/qtsingleapplication.h \
 		../qtsingleapplication/src/qtlocalpeer.h \

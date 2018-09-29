@@ -14,12 +14,14 @@ TEMPLATE = app
 SOURCES += main.cpp\
     mxmaindialog.cpp \
     systemactionwidget.cpp \
-    systemcontentwidget.cpp
+    systemcontentwidget.cpp \
+    v4l2_camera.cpp
 
 HEADERS  += \
     mxmaindialog.h \
     systemactionwidget.h \
-    systemcontentwidget.h
+    systemcontentwidget.h \
+    v4l2_camera.h
 
 target.path = /home/myir
 
@@ -66,6 +68,6 @@ RESOURCES += \
     img.qrc
 
 
-LIBS += -lv4lconvert
+LIBS += -lv4lconvert  -ljpeg  -lv4l2
 
 
