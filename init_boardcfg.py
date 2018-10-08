@@ -6,6 +6,14 @@ import json
 from itertools import islice
 from collections import OrderedDict
 
+def check_file(tmp){
+    if os.path.exists(tmp):
+ 	if os.path.getsize(tmp):
+   	   print "file is ok"
+ 	else:
+   	   #print "file is empty"
+	   os.system('cp /usr/share/board_cfg.json /usr/share/myir/board_cfg.json')
+
 def cmdline_read():
     rel=' '
     str_type='rootfstype='
@@ -93,6 +101,7 @@ if __name__ == '__main__':
 #        m_json_data = get_new_json(json_path, "512MB", "4GB")   
 #        rewrite_json_file(json_path,m_json_data) 
 #    else:
+	check_file(json_path)
 	s = get_nand_emmc_size()
 	m = get_mem_size()
 	m_json_data = get_new_json(json_path, m , s)
