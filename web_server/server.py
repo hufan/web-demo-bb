@@ -71,7 +71,7 @@ def main():
         else:
             time.sleep(3)
             eth_server_cnt=0
-            print "Waiting for network services"
+            #print "Waiting for network services"
 
     time.sleep(0.5)
     str_temp='Development server is running at http://'+ip_addr+':'+str(options.port)+'/login'
