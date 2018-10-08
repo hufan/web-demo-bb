@@ -93,7 +93,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 	init_v4l2();
 
-	init_Classifier();
+//	init_Classifier();
 
 
 	time1 = new QTimer(this);
@@ -413,14 +413,14 @@ int MainWindow::disaply_image()
 		ui->label->setPixmap(QPixmap::fromImage(image));
 #endif
 		
+//
+//	cv::Mat image_tmp1=QImage_to_cvMat(image,true);
+//	cv::Mat image_tmp2= face_detect(image_tmp1);
+//	QImage image_show=Mat2QImage(image_tmp2);
 
-	cv::Mat image_tmp1=QImage_to_cvMat(image,true);
-	cv::Mat image_tmp2= face_detect(image_tmp1);
-	QImage image_show=Mat2QImage(image_tmp2);
-
-	image_show.scaled(ui->label->size(), Qt::KeepAspectRatio);
+	image.scaled(ui->label->size(), Qt::KeepAspectRatio);
 	ui->label->setScaledContents(true);
-	ui->label->setPixmap(QPixmap::fromImage(image_show));
+	ui->label->setPixmap(QPixmap::fromImage(image));
 
 	return 0;
 }

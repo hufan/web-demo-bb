@@ -46,7 +46,7 @@ using namespace cv;
 
 
 
-#define DETECT_FACE  1
+//#define DETECT_FACE  1
 //#define DETECT_EYE  1
 
 
