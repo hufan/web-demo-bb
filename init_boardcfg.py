@@ -6,7 +6,7 @@ import json
 from itertools import islice
 from collections import OrderedDict
 
-def check_file(tmp){
+def check_file(tmp):
     if os.path.exists(tmp):
  	if os.path.getsize(tmp):
    	   print "file is ok"
