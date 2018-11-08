@@ -70,8 +70,26 @@ private:
     int                      m_width;
     int                      m_height;
 
+
+    QGroupBox           *m_SettingGroup;
+    QGridLayout         *m_SettingLayout;
+
     QStringList          infoList;
     QLabel               *m_show_pic;
+
+    QLabel               *mCameraResolution;
+    QComboBox            *mCameraResolutionComBox;
+
+    QLabel               *mCameraDev;
+    QComboBox            *mCameraDevComBox;
+
+
+
+    QGroupBox       *m_SendGroup;
+    QGridLayout     *m_SendLayout;
+    QTextEdit       *m_SendTextEdit1;
+    QPushButton     *m_SendPushButton;
+
 //    QGroupBox            *m_Grbox_Group;
 //    QGridLayout          *m_Grbox_Layout;
 //    QGridLayout          *mainLayout;
@@ -88,6 +106,9 @@ private:
     QGridLayout          *mainLayout;
 
     QTableView           *m_tableview;
+
+        void            createSettingGroupBox();
+        void            createSendGroupBox();
 	
 };
 

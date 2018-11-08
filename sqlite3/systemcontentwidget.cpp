@@ -49,7 +49,7 @@ SystemContentWidget::SystemContentWidget(QWidget *parent, MxApplication *obj, in
 
     sql_test=new sqlite3_base();
     sql_test->sqlite3_base_open("/home/myir/MYIR_RHMI.db");
-//    sql_test->sqlite3_base_create_tab();
+    sql_test->sqlite3_base_create_tab();
 
 }
 SystemContentWidget::~SystemContentWidget()
@@ -72,22 +72,23 @@ void SystemContentWidget::initUI()
     m_Grbox_Layout = new QGridLayout(m_Grbox_Group);
 
     m_insert_Button = new QPushButton();
-    m_insert_Button->setObjectName("sqlite3_insert");
+    //m_insert_Button->setObjectName("sqlite3_insert");
+    m_insert_Button->setObjectName("serialButton");
     m_insert_Button->setText(tr("Insert"));
 //     m_insert_Button->setMinimumSize(10,10);
 
     m_delete_Button = new QPushButton();
-    m_delete_Button->setObjectName("sqlite3_delet");
+    m_delete_Button->setObjectName("serialButton");
     m_delete_Button->setText(tr("Delete"));
 //    m_delete_Button->setMinimumSize(10,10);
 
     m_update_Button = new QPushButton();
-    m_update_Button->setObjectName("sqlite3_update");
+    m_update_Button->setObjectName("serialButton");
     m_update_Button->setText(tr("Update"));
 //    m_update_Button->setMinimumSize(30,30);
 
     m_tableview = new QTableView();
-    m_tableview->setObjectName("sqlite3_tableview");
+    m_tableview->setObjectName("serialButton");
 
 //    resizeRowsToContents();
 
