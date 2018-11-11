@@ -70,35 +70,26 @@ private:
     int                      m_width;
     int                      m_height;
 
+    QGroupBox               *m_SettingGroup;
+    QGridLayout             *m_SettingLayout;
 
-    QGroupBox           *m_SettingGroup;
-    QGridLayout         *m_SettingLayout;
+    QStringList             infoList;
+    QLabel                  *m_show_pic;
 
-    QStringList          infoList;
-    QLabel               *m_show_pic;
+    QLabel                  *mCameraResolution;
+    QComboBox               *mCameraResolutionComBox;
+    QLabel                  *mCameraDev;
+    QComboBox               *mCameraDevComBox;
 
-    QLabel               *mCameraResolution;
-    QComboBox            *mCameraResolutionComBox;
+    QGroupBox               *m_SendGroup;
+    QGridLayout             *m_SendLayout;
+    QTextEdit               *m_SendTextEdit1;
+    QPushButton             *m_SendPushButton;
 
-    QLabel               *mCameraDev;
-    QComboBox            *mCameraDevComBox;
-
-
-
-    QGroupBox       *m_SendGroup;
-    QGridLayout     *m_SendLayout;
-    QTextEdit       *m_SendTextEdit1;
-    QPushButton     *m_SendPushButton;
-
-//    QGroupBox            *m_Grbox_Group;
-//    QGridLayout          *m_Grbox_Layout;
-//    QGridLayout          *mainLayout;
-
-    QPushButton          *m_photograph_Button;
-    QPushButton          *m_savephoto_Button;
-    QPushButton          *m_preview_Button;
-
-    int                   pause;
+    QPushButton              *m_photograph_Button;
+    QPushButton              *m_savephoto_Button;
+    QPushButton              *m_preview_Button;
+    int                      pause;
 
     QGroupBox            *m_Grbox_Group;
     QGroupBox            *m_Grbox_Group2;
@@ -107,9 +98,9 @@ private:
 
     QTableView           *m_tableview;
 
-        void            createSettingGroupBox();
-        void            createSendGroupBox();
-	
+    void            createSettingGroupBox();
+    void            createSendGroupBox();
+
 };
 
 #endif // SYSTEMCONTENTWIDGET_H

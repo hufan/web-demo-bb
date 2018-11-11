@@ -14,9 +14,8 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QTimer>
-//#include <QTimer>
 #include <iostream>
-
+#include <QDateTime>
 #include <qpainter.h>
 
 #include "systemcontentwidget.h"
@@ -68,7 +67,6 @@ void SystemContentWidget::createSettingGroupBox()
     mCameraDev = new QLabel(m_SettingGroup);
     mCameraDev->setText(tr("Port:"));
 
-
     mCameraDevComBox = new QComboBox();
     mCameraDevComBox->setFixedWidth(120);
     mCameraDevComBox->insertItems(0,QStringList() \
@@ -81,24 +79,14 @@ void SystemContentWidget::createSettingGroupBox()
     mCameraResolution = new QLabel();
     mCameraResolution->setText(tr("Baud:"));
     mCameraResolutionComBox =  new QComboBox();
-//    mCameraResolutionComBox->insertItems(0,QStringList() \
-//          <<"300"<<"600"<<"1200"<< "2400" \
-//          <<"4800"<<"9600"<<"19200"<<"38400" \
-//          <<"57600"<<"115200") ;
     mCameraResolutionComBox->insertItems(0,QStringList() \
           <<"176x144"<<"352x288"<<"160x120"<< "320x240" \
           <<"640x480"<<"1280x720") ;
-
-//    mCameraResolutionComBox->setFixedHeight(30);
     mCameraResolutionComBox->setFixedWidth(120);
-//        maximumWidth();
-//MaxLength
-
 
     QHBoxLayout *hLayout2 = new QHBoxLayout();
     hLayout2->addWidget(mCameraResolution);
     hLayout2->addWidget(mCameraResolutionComBox);
-
 
     m_preview_Button = new QPushButton();
     m_preview_Button->setObjectName("serialButton");
@@ -117,21 +105,6 @@ void SystemContentWidget::createSettingGroupBox()
     m_savephoto_Button->setText(tr("Save"));
     QHBoxLayout *hLayout5 = new QHBoxLayout(m_SettingGroup);
     hLayout5->addWidget(m_savephoto_Button);
-
-//    mSerialCheckBit = new QLabel(m_SettingGroup);
-//    mSerialCheckBit->setText(tr("Check:"));
-//    mSerialCheckBitComboBox =  new QComboBox(m_SettingGroup);
-//    mSerialCheckBitComboBox->insertItems(0,QStringList()<<tr("NONE")<<tr("EVEN")<<tr("ODD"));
-//    QHBoxLayout *hLayout3 = new QHBoxLayout(m_SettingGroup);
-//    hLayout3->addWidget(mSerialCheckBit);
-//    hLayout3->addWidget(mSerialCheckBitComboBox);
-
-//    mSerialDataBit = new QLabel(m_SettingGroup);
-//    mSerialDataBit->setText(tr("Data:"));
-//    mSerialDataBitComboBox =  new QComboBox(m_SettingGroup);
-//    QHBoxLayout *hLayout4 = new QHBoxLayout(m_SettingGroup);
-//    hLayout4->addWidget(mSerialDataBit);
-
 
     if(m_width < DEFAULT_SCREEN_WIDTH){
 //        m_SettingLayout->addLayout(hLayout1,0,0,1,1);
@@ -159,10 +132,14 @@ void SystemContentWidget::createSettingGroupBox()
 }
 void SystemContentWidget::createSendGroupBox()
 {
-    m_SendGroup = new QGroupBox(tr("Send"));
+    m_SendGroup = new QGroupBox(tr("Preview"));
     m_SendLayout = new QGridLayout(m_SendGroup);
 
-    m_SendTextEdit1 = new QTextEdit(m_SendGroup);
+//    m_SendTextEdit1 = new QTextEdit(m_SendGroup);
+
+    m_show_pic = new QLabel();
+    m_show_pic->setText(tr("photo show "));
+
 //    m_SendPushButton = new QPushButton(m_SendGroup);
 //    m_SendPushButton->setObjectName("serialButton");
 //    m_SendPushButton->setText(tr("Send"));
@@ -170,9 +147,9 @@ void SystemContentWidget::createSendGroupBox()
 //    QVBoxLayout *vLayout = new QVBoxLayout(m_SendGroup);
 //    vLayout->addWidget(m_SendPushButton);
 
-    m_SendLayout->addWidget(m_SendTextEdit1,0,0,2,99);
+    m_SendLayout->addWidget(m_show_pic,0,0,2,99);
 //    m_SendLayout->addLayout(vLayout,1,100,1,1,Qt::AlignBottom);
-    m_SendLayout->setColumnMinimumWidth(100,80);
+//    m_SendLayout->setColumnMinimumWidth(100,80);
 
     m_SendGroup->setLayout(m_SendLayout);
 }
@@ -184,7 +161,7 @@ void SystemContentWidget::initUI()
 
     createSettingGroupBox();
     createSendGroupBox();
-//   return ;
+
 #if 0
     mainLayout = new QGridLayout();
     m_Grbox_Group = new QGroupBox("Camera");
@@ -238,17 +215,17 @@ void SystemContentWidget::initUI()
 //    m_SettingLayout->addLayout(hLayout2,0,11,1,10);
 //    m_SettingGroup->setLayout(m_SettingLayout);
 
-
 //    mainLayout->setColumnStretch(0, 1);
 //    mainLayout->setColumnStretch(1, 1);
     mainLayout -> setRowStretch(0, 1);
-     mainLayout -> setRowStretch(1, 4);
+    mainLayout -> setRowStretch(1, 4);
 
     mainLayout->addWidget(m_SettingGroup, 0,0);
     mainLayout->addWidget(m_SendGroup,1,0);
 
     this->setLayout(mainLayout);
-    return ;
+//    return ;
+
 #if 0
     m_show_pic = new QLabel(m_Grbox_Group);
     m_show_pic->setText(tr("photo show "));
@@ -297,6 +274,7 @@ void SystemContentWidget::initUI()
 
     connect(m_photograph_Button, SIGNAL(clicked()), this, SLOT(click_Photograph()));
     connect(m_preview_Button, SIGNAL(clicked()), this, SLOT(camera_preview_v4l2()));
+    connect(m_savephoto_Button, SIGNAL(clicked()), this, SLOT(click_SavePhoto()));
     //    connect(m_delete_Button, SIGNAL(clicked()), this, SLOT(clickDeleteData_sqlite()));
 
 
@@ -316,7 +294,7 @@ void SystemContentWidget::initUI()
     /*init camera  and time */
     cameraTimer = new QTimer(this);
     connect( cameraTimer, SIGNAL(timeout()),this, SLOT(timerDone()) );
-    //cameraTimer->start( 200 );
+    cameraTimer->start( 200 );
 }
 
 int SystemContentWidget::click_Photograph()
@@ -336,7 +314,29 @@ int SystemContentWidget::camera_preview_v4l2()
 }
 int SystemContentWidget::click_SavePhoto()
 {
-  return 0;
+
+    QDateTime current_date_time =QDateTime::currentDateTime();
+    QString current_date =current_date_time.toString("yyyyMMdd-hhmmsszzz");
+    QString filepatch;
+    QString fileName;
+    QString all_save_info;
+    char *photo_save;
+
+    filepatch="/home/root/";
+    fileName=".jpg";
+
+    all_save_info.append(filepatch);
+    all_save_info.append(current_date);
+    all_save_info.append(fileName);
+
+    QByteArray temp=all_save_info.toLatin1();
+    photo_save=temp.data();
+
+//    QTextStream out(stdout);
+//    out << all_save_info<<endl;
+
+    m_camera_v4l2->save_jpeg((char *)m_camera_v4l2->buffers[m_camera_v4l2->buf.index].start, m_camera_v4l2->width, m_camera_v4l2->height, photo_save);
+    return 0;
 }
 
 void SystemContentWidget::timerDone(){

@@ -283,7 +283,7 @@ int  v4l2_camera::frameRead(void)
     }
     assert(buf.index < n_buffers);
     //imageProcess(buffers[buf.index].start,buf.timestamp);
-    save_rgb_to_jpg((char *)buffers[buf.index].start, width, height, "/home/root/h11115555.jpg");
+    //save_rgb_to_jpg((char *)buffers[buf.index].start, width, height, "/home/root/h11115555.jpg");
 
     if (-1 == xioctl(fd, VIDIOC_QBUF, &buf))
     {
