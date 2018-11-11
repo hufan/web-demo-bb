@@ -58,6 +58,10 @@
         <translation>波特率:</translation>
     </message>
     <message>
+        <source>Resolution:</source>
+        <translation>分辨率:</translation>
+    </message>
+    <message>
         <source>Check:</source>
         <translation>校验位:</translation>
     </message>
@@ -84,6 +88,34 @@
     <message>
         <source>Open</source>
         <translation>打开</translation>
+    </message>
+    <message>
+        <source>Preview</source>
+        <translation>预览</translation>
+    </message>
+    <message>
+        <source>Photograph</source>
+        <translation>拍照</translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation>保存</translation>
+    </message>
+    <message>
+        <source>Insert_sqlite3</source>
+        <translation>插入</translation>
+    </message>
+    <message>
+        <source>Delete_sqlite3</source>
+        <translation>删除</translation>
+    </message>
+    <message>
+        <source>Update_sqlite3</source>
+        <translation>更新</translation>
+    </message>
+    <message>
+        <source>Sqlite3</source>
+        <translation>数据库</translation>
     </message>
     <message>
         <source>Send</source>
@@ -148,7 +180,6 @@
     <message>
         <source>Can had opened!Now use the opened configuration!</source>
         <translation>CAN已打开，使用已打开的配置！</translation>
-
     </message>
     <message>
         <source>CAN:</source>
@@ -158,6 +189,11 @@
         <source>Loop:</source>
         <translation>回环模式：</translation>
     </message>
+    <message>
+        <source>Baud:</source>
+        <translation>回环模式：</translation>
+    </message>
+
     <message>
         <source>can id(hex):</source>
         <translation>can id(十六进制):</translation>

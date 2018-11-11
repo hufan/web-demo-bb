@@ -70,4 +70,3 @@ RESOURCES += \
 
 LIBS += -lv4lconvert  -ljpeg  -lv4l2
 
-

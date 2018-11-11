@@ -32,3 +32,7 @@ HEADERS  += mxmaindialog.h \
 RESOURCES += \
     main.qrc
 
+
+TRANSLATIONS += english.ts chinese.ts
+
+
