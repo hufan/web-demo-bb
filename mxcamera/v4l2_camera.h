@@ -52,8 +52,8 @@ private:
 public:
     v4l2_camera();
 
-    int deviceOpen();
-    int deviceClose();
+    int  deviceOpen();
+    int  deviceClose();
     int  deviceInit();
     int  deviceUninit(void);
     int  captureStart(void);
@@ -62,17 +62,16 @@ public:
     int  mainloop();
     int  save_jpeg(char *soureceData, int imgWidth, int imgHeight, char *fileName);
 
-    int fd;
-    int fps;
-    unsigned int width ;
-    unsigned int height ;
-    int continuous;
-    buffer          *buffers;
+    int              fd;
+    int              fps;
+    unsigned int     width;
+    unsigned int     height;
+    int              continuous;
+    buffer           *buffers;
     unsigned int     n_buffers;
 
-    char * deviceName;
-
-    struct v4l2_buffer buf;
+    char                *deviceName;
+    struct v4l2_buffer  buf;
 };
 
 #endif // V4L2_CAMERA_H

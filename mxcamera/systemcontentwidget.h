@@ -63,6 +63,7 @@ public slots:
     int click_Photograph();
     int click_SavePhoto();
     int camera_preview_v4l2();
+    int release_camera_init();
 
 private:
     QWidget                 *m_parent;
@@ -83,13 +84,12 @@ private:
 
     QGroupBox               *m_SendGroup;
     QGridLayout             *m_SendLayout;
-    QTextEdit               *m_SendTextEdit1;
-    QPushButton             *m_SendPushButton;
 
     QPushButton              *m_photograph_Button;
     QPushButton              *m_savephoto_Button;
     QPushButton              *m_preview_Button;
     int                      pause;
+    int                      inint_flags;
 
     QGroupBox            *m_Grbox_Group;
     QGroupBox            *m_Grbox_Group2;
@@ -99,7 +99,8 @@ private:
     QTableView           *m_tableview;
 
     void            createSettingGroupBox();
-    void            createSendGroupBox();
+    void            createPhotoShowGroupBox();
+     int            init_camera_dev();
 
 };
 

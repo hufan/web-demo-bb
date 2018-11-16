@@ -68,33 +68,29 @@ void SystemContentWidget::initUI()
 {
     mainLayout = new QGridLayout();
 
-    m_Grbox_Group = new QGroupBox("Sqlite3");
+    m_Grbox_Group = new QGroupBox(tr("Sqlite3"));
     m_Grbox_Layout = new QGridLayout(m_Grbox_Group);
 
     m_insert_Button = new QPushButton();
     //m_insert_Button->setObjectName("sqlite3_insert");
     m_insert_Button->setObjectName("serialButton");
-    m_insert_Button->setText(tr("Insert"));
+    m_insert_Button->setText(tr("Insert_sqlite3"));
 //     m_insert_Button->setMinimumSize(10,10);
 
     m_delete_Button = new QPushButton();
     m_delete_Button->setObjectName("serialButton");
-    m_delete_Button->setText(tr("Delete"));
+    m_delete_Button->setText(tr("Delete_sqlite3"));
 //    m_delete_Button->setMinimumSize(10,10);
 
     m_update_Button = new QPushButton();
     m_update_Button->setObjectName("serialButton");
-    m_update_Button->setText(tr("Update"));
+    m_update_Button->setText(tr("Update_sqlite3"));
 //    m_update_Button->setMinimumSize(30,30);
 
     m_tableview = new QTableView();
     m_tableview->setObjectName("serialButton");
-
 //    resizeRowsToContents();
-
     m_tableview->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-    //m_tableview->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-
 
     QHBoxLayout *hLayout1 = new QHBoxLayout(m_Grbox_Group);
     hLayout1->setContentsMargins(40,10,40,10);

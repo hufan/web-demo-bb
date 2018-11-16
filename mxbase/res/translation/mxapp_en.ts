@@ -49,6 +49,10 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Resolution:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Check:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -74,6 +78,34 @@
     </message>
     <message>
         <source>Open</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preview</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Photograph</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Insert_sqlite3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete_sqlite3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update_sqlite3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sqlite3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
