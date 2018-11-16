@@ -40,4 +40,10 @@
 
 #define MAX_INPUT 		255
 
+#define MXDE_BOARD_CFG_PATH "/usr/share/myir/board_cfg.json"
+#define MXDE_DBUS_XML "/usr/share/myir/mxde.xml"
+int IsUtf8Format(const char *str);
+
+void board_cfg_init();
+void get_cfg_list(char *item_name,char * result);
 #endif		// __COMMON_H__

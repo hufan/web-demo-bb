@@ -21,10 +21,18 @@
 #include "common.h"
 #include "can.h"
 
-#define CAN_INFO_PATH "/usr/share/myir/board_can_info"
+
 static int can_baudrate = CAN_DEFAULT_BAUDRATE;
-pthread_t can_thread_id = 0;
+
 int thread_can_fd = 0;
+
+
+#define MAX_CAN_OPENED 5
+struct opened_can_t opened_can[MAX_CAN_OPENED];
+
+pthread_t can_thread_id[MAX_CAN_OPENED] = {0};
+void *(*can_thread[MAX_CAN_OPENED])(void *args);
+
 static unsigned char asc2nibble(char c) {
 
 	if ((c >= '0') && (c <= '9'))
@@ -55,7 +63,7 @@ int				can_init(const char * can)
 	struct ifreq ifr;
 	struct sockaddr_can can_addr;
 	int loopback = 0;
-	int flags;
+    int flags,i;
 
 	memset(&ifr, 0, sizeof(ifr));
 	
@@ -79,10 +87,43 @@ int				can_init(const char * can)
 	bind(canfd, (struct sockaddr *)&can_addr, sizeof(can_addr));
 	
 	/* Set the lookback rules */
-	setsockopt(canfd, SOL_CAN_RAW, CAN_RAW_LOOPBACK,
+    /*CAN_RAW_FILTER CAN_RAW_LOOPBACK*/
+    setsockopt(canfd, SOL_CAN_RAW, CAN_RAW_FILTER,
 			   &loopback, sizeof(loopback));
-    thread_can_fd = canfd;
+
+
+    for(i = 0 ;i < MAX_CAN_OPENED;i++ )
+    {
+        if(opened_can[i].device_name != NULL)
+        {
+            if(strcmp(opened_can[i].device_name,can) == 0)
+            {
+                opened_can[i].fd = canfd;
+            }
+        }
+    }
 	return canfd;
+}
+void close_can_port(char *can_name,int can_fd)
+{
+    int i;
+    struct opened_can_t can_ret;
+    for(i = 0 ;i < MAX_CAN_OPENED;i++ )
+    {
+        if((opened_can[i].fd == can_fd) && (opened_can[i].fd != 0))
+        {
+
+            printf("opened_can[%d].open_cnt %d\n",i,opened_can[i].open_cnt);
+            if(opened_can[i].open_cnt <= 0)
+            {
+                memset(&opened_can[i], 0, sizeof(struct opened_can_t));
+                close(can_fd);
+
+                can_setting(can_name,can_baudrate,CAN_DISABLE,"off",&can_ret);
+            }
+        }
+    }
+
 }
 
 /******************************************************************************
@@ -96,18 +137,60 @@ int				can_init(const char * can)
   Return:         int 	   --  can setting status 0:success 
   Others:         NONE
 *******************************************************************************/
-int 			can_setting(const char* can, const int bitrate, int enable,const char* loop)
+int 			can_setting( char* can, const int bitrate, int enable, char* loop,struct opened_can_t *can_configure)
 {
 	int ret = 0;
 	char cmdline[128] = { '\0' };
     can_baudrate = bitrate;
-	if(enable == 1){
 
+    int i = 0,j= 0;
+
+
+	if(enable == 1){
+        for(i = 0 ;i < MAX_CAN_OPENED;i++ )
+        {
+            if(opened_can[i].device_name != NULL)
+            {
+                if(strcmp(opened_can[i].device_name,can) == 0)
+                {
+                    break;
+                }
+            }
+        }
+
+        if(i == MAX_CAN_OPENED)
+        {
+            for(j = 0; j < MAX_CAN_OPENED ; j++)
+            {
+                if(opened_can[j].device_name == NULL)
+                    break;
+            }
+            opened_can[j].device_name = can;
+            opened_can[j].bitrate = bitrate;
+            opened_can[j].loop = loop;
+            opened_can[j].open_cnt++;
+
+        }
+
+        if(i != MAX_CAN_OPENED)
+        {
+            printf("can opened!\n");
+            opened_can[i].open_cnt++;
+            memcpy(can_configure,&opened_can[i],sizeof(struct opened_can_t));
+
+            return 100;
+        }
         if(strcmp(loop,"ON") == 0)
         {
+            sprintf(cmdline,
+                    "ip link set %s down; ip link set %s type can bitrate %ld triple-sampling on  loopback on; ip link set %s up",
+                    can, can, bitrate, can);
         }
         if(strcmp(loop,"OFF") == 0)
         {
+            sprintf(cmdline,
+                    "ip link set %s down; ip link set %s type can bitrate %ld triple-sampling on  loopback off; ip link set %s up",
+                    can, can, bitrate, can);
         }
     }
 	else if(enable == 0){
@@ -233,34 +316,14 @@ int				parse_canframe(char* strFrame, struct can_frame *frame)
 
 void get_can_list(char * result)
 {
-    char tmp[30]={0};
-    int n = 0;
-    FILE *fp;
 
-    fp = fopen(CAN_INFO_PATH,"r");
+    get_cfg_list("can",result);
 
-    if (NULL == fp)
-      {
-          printf("fopen error!\n");
-          return;
-      }
-    while(fgets(tmp,20,fp) != NULL)
-    {
-        n +=sprintf(result+n,"%s",tmp);
-        memset(tmp, 0, sizeof(tmp));
-    }
 }
 
 
-void close_can_port(char *can_name,int can_fd)
-{
-    //delete can recv thread
-    close(can_fd);
-    thread_can_fd = 0;
-    can_setting(can_name,can_baudrate,CAN_DISABLE,"off");
-}
 
-int * can_read_thread(void *arg)
+void * can_read_thread0(void *arg)
 {
     struct timeval tv;
     DBusMessage* msg;
@@ -270,26 +333,27 @@ int * can_read_thread(void *arg)
     struct can_frame can_read_frame;
     char *respone = NULL;
     char temp[100] = {0};
-
+    int fd = (int )arg;
+    printf("can_read_thread0 fd:%d\n",fd);
     while(1)
     {
         FD_ZERO(&fds);
-        FD_SET(thread_can_fd, &fds);
+        FD_SET(fd, &fds);
 
         tv.tv_sec = 0;
         tv.tv_usec = 100000 ;
 
-        ret = select(thread_can_fd+1, &fds, NULL, NULL, &tv);
+        ret = select(fd+1, &fds, NULL, NULL, &tv);
         if(ret < 0){
                 perror("select error\n");
         }
         else
         {
 
-            if(ret && FD_ISSET(thread_can_fd, &fds))
+            if(ret && FD_ISSET(fd, &fds))
             {
                 memset(&can_read_frame, 0, sizeof( struct can_frame));
-                len = read(thread_can_fd, &can_read_frame, sizeof(struct can_frame));
+                len = read(fd, &can_read_frame, sizeof(struct can_frame));
                 if(len > 0)
                 {
                     memset(temp, 0, sizeof(temp));
@@ -307,25 +371,25 @@ int * can_read_thread(void *arg)
                                                   DBUS_SERVER_INTERFACE,
                                                   "sigCanRecv");
                     dbus_message_iter_init_append(msg, &args);
-                    if (!dbus_message_iter_append_basic(&args, DBUS_TYPE_INT32, &thread_can_fd)) {
+                    if (!dbus_message_iter_append_basic(&args, DBUS_TYPE_INT32, &fd)) {
                         fprintf(stderr, "Out Of Memory!\n");
-                        return 0;
+                        return NULL;
                     }
                     if (!dbus_message_iter_append_basic(&args, DBUS_TYPE_INT32, &can_id)) {
                         fprintf(stderr, "Out Of Memory!\n");
-                        return 0;
+                        return NULL;
                     }
                     if (!dbus_message_iter_append_basic(&args, DBUS_TYPE_INT32, &can_dlc)) {
                         fprintf(stderr, "Out Of Memory!\n");
-                        return 0;
+                        return NULL;
                     }
                     if (!dbus_message_iter_append_basic(&args, DBUS_TYPE_STRING, &respone)) {
                         fprintf(stderr, "Out Of Memory!\n");
-                        return 0;
+                        return NULL;
                     }
                     if (!dbus_connection_send(dbus_server_conn, msg, NULL)) {
                         fprintf(stderr, "Out Of Memory!\n");
-                        return 0;
+                        return NULL;
                     }
 
                     dbus_connection_flush(dbus_server_conn);
@@ -337,19 +401,358 @@ int * can_read_thread(void *arg)
     }
     return NULL;
 }
-void create_can_read_thread()
+void * can_read_thread1(void *arg)
 {
-     pthread_create(&can_thread_id,NULL,(void *)can_read_thread,NULL);
-}
-void delete_can_read_thread()
-{
-    if(can_thread_id != 0)
+    struct timeval tv;
+    DBusMessage* msg;
+    DBusMessageIter args;
+    fd_set fds;
+    int ret=0,len=0,can_id,can_dlc,j;
+    struct can_frame can_read_frame;
+    char *respone = NULL;
+    char temp[100] = {0};
+    int fd = (int )arg;
+    printf("can_read_thread1 fd:%d\n",fd);
+    while(1)
     {
+        FD_ZERO(&fds);
+        FD_SET(fd, &fds);
 
-        pthread_cancel(can_thread_id);
-        pthread_join(can_thread_id,NULL);
-        can_thread_id = 0;
+        tv.tv_sec = 0;
+        tv.tv_usec = 100000 ;
 
+        ret = select(fd+1, &fds, NULL, NULL, &tv);
+        if(ret < 0){
+                perror("select error\n");
+        }
+        else
+        {
+
+            if(ret && FD_ISSET(fd, &fds))
+            {
+                memset(&can_read_frame, 0, sizeof( struct can_frame));
+                len = read(fd, &can_read_frame, sizeof(struct can_frame));
+                if(len > 0)
+                {
+                    memset(temp, 0, sizeof(temp));
+                    j = 0;
+
+                    for(int i = 0; i < can_read_frame.can_dlc; i++){
+                                j += sprintf(temp+j,"%#x ", can_read_frame.data[i]);
+                       }
+
+                    can_id = can_read_frame.can_id;
+                    can_dlc = can_read_frame.can_dlc;
+
+                    respone = &temp[0];
+                    msg = dbus_message_new_signal(DBUS_SERVER_PATH,
+                                                  DBUS_SERVER_INTERFACE,
+                                                  "sigCanRecv");
+                    dbus_message_iter_init_append(msg, &args);
+                    if (!dbus_message_iter_append_basic(&args, DBUS_TYPE_INT32, &fd)) {
+                        fprintf(stderr, "Out Of Memory!\n");
+                        return NULL;
+                    }
+                    if (!dbus_message_iter_append_basic(&args, DBUS_TYPE_INT32, &can_id)) {
+                        fprintf(stderr, "Out Of Memory!\n");
+                        return NULL;
+                    }
+                    if (!dbus_message_iter_append_basic(&args, DBUS_TYPE_INT32, &can_dlc)) {
+                        fprintf(stderr, "Out Of Memory!\n");
+                        return NULL;
+                    }
+                    if (!dbus_message_iter_append_basic(&args, DBUS_TYPE_STRING, &respone)) {
+                        fprintf(stderr, "Out Of Memory!\n");
+                        return NULL;
+                    }
+                    if (!dbus_connection_send(dbus_server_conn, msg, NULL)) {
+                        fprintf(stderr, "Out Of Memory!\n");
+                        return NULL;
+                    }
+
+                    dbus_connection_flush(dbus_server_conn);
+                    dbus_message_unref(msg);
+                }
+            }
+
+        }
+    }
+    return NULL;
+}
+void * can_read_thread2(void *arg)
+{
+    struct timeval tv;
+    DBusMessage* msg;
+    DBusMessageIter args;
+    fd_set fds;
+    int ret=0,len=0,can_id,can_dlc,j;
+    struct can_frame can_read_frame;
+    char *respone = NULL;
+    char temp[100] = {0};
+    int fd = (int )arg;
+    printf("can_read_thread2 fd:%d\n",fd);
+    while(1)
+    {
+        FD_ZERO(&fds);
+        FD_SET(fd, &fds);
+
+        tv.tv_sec = 0;
+        tv.tv_usec = 100000 ;
+
+        ret = select(fd+1, &fds, NULL, NULL, &tv);
+        if(ret < 0){
+                perror("select error\n");
+        }
+        else
+        {
+
+            if(ret && FD_ISSET(fd, &fds))
+            {
+                memset(&can_read_frame, 0, sizeof( struct can_frame));
+                len = read(fd, &can_read_frame, sizeof(struct can_frame));
+                if(len > 0)
+                {
+                    memset(temp, 0, sizeof(temp));
+                    j = 0;
+
+                    for(int i = 0; i < can_read_frame.can_dlc; i++){
+                                j += sprintf(temp+j,"%#x ", can_read_frame.data[i]);
+                       }
+
+                    can_id = can_read_frame.can_id;
+                    can_dlc = can_read_frame.can_dlc;
+
+                    respone = &temp[0];
+                    msg = dbus_message_new_signal(DBUS_SERVER_PATH,
+                                                  DBUS_SERVER_INTERFACE,
+                                                  "sigCanRecv");
+                    dbus_message_iter_init_append(msg, &args);
+                    if (!dbus_message_iter_append_basic(&args, DBUS_TYPE_INT32, &fd)) {
+                        fprintf(stderr, "Out Of Memory!\n");
+    return NULL;
+                    }
+                    if (!dbus_message_iter_append_basic(&args, DBUS_TYPE_INT32, &can_id)) {
+                        fprintf(stderr, "Out Of Memory!\n");
+    return NULL;
+                    }
+                    if (!dbus_message_iter_append_basic(&args, DBUS_TYPE_INT32, &can_dlc)) {
+                        fprintf(stderr, "Out Of Memory!\n");
+    return NULL;
+                    }
+                    if (!dbus_message_iter_append_basic(&args, DBUS_TYPE_STRING, &respone)) {
+                        fprintf(stderr, "Out Of Memory!\n");
+    return NULL;
+                    }
+                    if (!dbus_connection_send(dbus_server_conn, msg, NULL)) {
+                        fprintf(stderr, "Out Of Memory!\n");
+    return NULL;
+                    }
+
+                    dbus_connection_flush(dbus_server_conn);
+                    dbus_message_unref(msg);
+                }
+            }
+
+        }
+    }
+    return NULL;
+}
+void * can_read_thread3(void *arg)
+{
+    struct timeval tv;
+    DBusMessage* msg;
+    DBusMessageIter args;
+    fd_set fds;
+    int ret=0,len=0,can_id,can_dlc,j;
+    struct can_frame can_read_frame;
+    char *respone = NULL;
+    char temp[100] = {0};
+    int fd = (int )arg;
+    printf("can_read_thread3 fd:%d\n",fd);
+    while(1)
+    {
+        FD_ZERO(&fds);
+        FD_SET(fd, &fds);
+
+        tv.tv_sec = 0;
+        tv.tv_usec = 100000 ;
+
+        ret = select(fd+1, &fds, NULL, NULL, &tv);
+        if(ret < 0){
+                perror("select error\n");
+        }
+        else
+        {
+
+            if(ret && FD_ISSET(fd, &fds))
+            {
+                memset(&can_read_frame, 0, sizeof( struct can_frame));
+                len = read(fd, &can_read_frame, sizeof(struct can_frame));
+                if(len > 0)
+                {
+                    memset(temp, 0, sizeof(temp));
+                    j = 0;
+
+                    for(int i = 0; i < can_read_frame.can_dlc; i++){
+                                j += sprintf(temp+j,"%#x ", can_read_frame.data[i]);
+                       }
+
+                    can_id = can_read_frame.can_id;
+                    can_dlc = can_read_frame.can_dlc;
+
+                    respone = &temp[0];
+                    msg = dbus_message_new_signal(DBUS_SERVER_PATH,
+                                                  DBUS_SERVER_INTERFACE,
+                                                  "sigCanRecv");
+                    dbus_message_iter_init_append(msg, &args);
+                    if (!dbus_message_iter_append_basic(&args, DBUS_TYPE_INT32, &fd)) {
+                        fprintf(stderr, "Out Of Memory!\n");
+    return NULL;
+                    }
+                    if (!dbus_message_iter_append_basic(&args, DBUS_TYPE_INT32, &can_id)) {
+                        fprintf(stderr, "Out Of Memory!\n");
+    return NULL;
+                    }
+                    if (!dbus_message_iter_append_basic(&args, DBUS_TYPE_INT32, &can_dlc)) {
+                        fprintf(stderr, "Out Of Memory!\n");
+    return NULL;
+                    }
+                    if (!dbus_message_iter_append_basic(&args, DBUS_TYPE_STRING, &respone)) {
+                        fprintf(stderr, "Out Of Memory!\n");
+    return NULL;
+                    }
+                    if (!dbus_connection_send(dbus_server_conn, msg, NULL)) {
+                        fprintf(stderr, "Out Of Memory!\n");
+    return NULL;
+                    }
+
+                    dbus_connection_flush(dbus_server_conn);
+                    dbus_message_unref(msg);
+                }
+            }
+
+        }
+    }
+    return NULL;
+}
+void * can_read_thread4(void *arg)
+{
+    struct timeval tv;
+    DBusMessage* msg;
+    DBusMessageIter args;
+    fd_set fds;
+    int ret=0,len=0,can_id,can_dlc,j;
+    struct can_frame can_read_frame;
+    char *respone = NULL;
+    char temp[100] = {0};
+    int fd = (int )arg;
+    printf("can_read_thread4 fd:%d\n",fd);
+    while(1)
+    {
+        FD_ZERO(&fds);
+        FD_SET(fd, &fds);
+
+        tv.tv_sec = 0;
+        tv.tv_usec = 100000 ;
+
+        ret = select(fd+1, &fds, NULL, NULL, &tv);
+        if(ret < 0){
+                perror("select error\n");
+        }
+        else
+        {
+
+            if(ret && FD_ISSET(fd, &fds))
+            {
+                memset(&can_read_frame, 0, sizeof( struct can_frame));
+                len = read(fd, &can_read_frame, sizeof(struct can_frame));
+                if(len > 0)
+                {
+                    memset(temp, 0, sizeof(temp));
+                    j = 0;
+
+                    for(int i = 0; i < can_read_frame.can_dlc; i++){
+                                j += sprintf(temp+j,"%#x ", can_read_frame.data[i]);
+                       }
+
+                    can_id = can_read_frame.can_id;
+                    can_dlc = can_read_frame.can_dlc;
+
+                    respone = &temp[0];
+                    msg = dbus_message_new_signal(DBUS_SERVER_PATH,
+                                                  DBUS_SERVER_INTERFACE,
+                                                  "sigCanRecv");
+                    dbus_message_iter_init_append(msg, &args);
+                    if (!dbus_message_iter_append_basic(&args, DBUS_TYPE_INT32, &fd)) {
+                        fprintf(stderr, "Out Of Memory!\n");
+    			return NULL;
+                    }
+                    if (!dbus_message_iter_append_basic(&args, DBUS_TYPE_INT32, &can_id)) {
+                        fprintf(stderr, "Out Of Memory!\n");
+			return NULL;
+                    }
+                    if (!dbus_message_iter_append_basic(&args, DBUS_TYPE_INT32, &can_dlc)) {
+                        fprintf(stderr, "Out Of Memory!\n");
+			return NULL;
+                    }
+                    if (!dbus_message_iter_append_basic(&args, DBUS_TYPE_STRING, &respone)) {
+                        fprintf(stderr, "Out Of Memory!\n");
+			return NULL;
+                    }
+                    if (!dbus_connection_send(dbus_server_conn, msg, NULL)) {
+                        fprintf(stderr, "Out Of Memory!\n");
+		        return NULL;
+                    }
+
+                    dbus_connection_flush(dbus_server_conn);
+                    dbus_message_unref(msg);
+                }
+            }
+
+        }
+    }
+    return NULL;
+}
+void create_can_read_thread(int fd)
+{
+    int i=0,j=0;
+    for(i = 0; i < MAX_CAN_OPENED;i++)
+    {
+        if(opened_can[i].fd != 0)
+        {
+
+            j++;
+        }
+    }
+    //create_tty_read_thread(j,atoi(param[0]));
+    pthread_create(&can_thread_id[j-1],NULL,can_thread[j-1],(void *) fd);
+    printf("pthread_create pthread_id:%lu fd:%d\n",can_thread_id[j-1],fd);
+    for(i = 0; i < MAX_CAN_OPENED;i++)
+    {
+        if((opened_can[i].fd == fd) && (opened_can[i].fd != 0))
+        {
+             opened_can[i].pthread_id = can_thread_id[j-1];
+
+        }
+    }
+}
+void delete_can_read_thread(int fd)
+{
+
+    int i =0;
+    for(i = 0; i < MAX_CAN_OPENED;i++)
+    {
+        if((opened_can[i].fd == fd) && (opened_can[i].fd != 0))
+        {
+            opened_can[i].open_cnt--;
+            if(opened_can[i].open_cnt == 0)
+            {
+                printf("pthread_cancel pthread_id:%lu fd:%d\n",opened_can[i].pthread_id,fd);
+                pthread_cancel(opened_can[i].pthread_id);
+                pthread_join(opened_can[i].pthread_id,NULL);
+                opened_can[i].pthread_id = 0;
+            }
+        }
     }
 }
 void can_data_write(int fd,char *data)
@@ -377,4 +780,17 @@ void can_data_write(int fd,char *data)
     }
 
 
+}
+void can_data_init()
+{
+    int i = 0;
+    for(i = 0; i< MAX_CAN_OPENED;i++)
+    {
+        memset(&opened_can[i], 0, sizeof(struct opened_can_t));
+    }
+    can_thread[0] = can_read_thread0;
+    can_thread[1] = can_read_thread1;
+    can_thread[2] = can_read_thread2;
+    can_thread[3] = can_read_thread3;
+    can_thread[4] = can_read_thread4;
 }

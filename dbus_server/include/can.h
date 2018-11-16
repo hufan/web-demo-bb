@@ -31,7 +31,7 @@
 #define CAN_READ_TIMEOUT_USEC	5000
 
 #define DATA_SEPERATOR 			'.'
-#define CANID_DELIM 			'#'
+#define CANID_DELIM 			'+'
 
 struct can_dev
 {
@@ -41,7 +41,15 @@ struct can_dev
 };
 typedef struct can_dev can_dev_t;
 
+struct opened_can_t{
+    char *device_name;
+    int fd;
+    int bitrate;
+    char *loop;
+    int open_cnt;
+    pthread_t pthread_id;
 
+};
 
 /******************************************************************************
   Function:       can_init
@@ -65,7 +73,8 @@ int				can_init(const char * can);
   Return:         int 	   --  can setting status 0:success 
   Others:         NONE
 *******************************************************************************/
-int 			can_setting(const char* can, const int bitrate, int enable,const char* loop);
+//int 			can_setting(const char* can, const int bitrate, int enable,const char* loop,struct opened_can_t *can_configure);
+int                     can_setting( char* can, const int bitrate, int enable, char* loop,struct opened_can_t *can_configure);
 
 int				can_read(int fd, struct can_frame *frame);
 int				can_write(int fd, struct can_frame *frame, int len);
@@ -89,5 +98,6 @@ void get_can_list(char * result);
 
 void can_data_write(int fd, char *data);
 void close_can_port(char *can_name,int can_fd);
-void delete_can_read_thread();
+void delete_can_read_thread(int fd);
+void can_data_init();
 #endif		

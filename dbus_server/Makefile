@@ -1,13 +1,13 @@
-TARGET1_NAME=dbus_server
+TARGET1_NAME=mxbackend
 TARGET1 = $(TARGET_BIN_DIR)/$(TARGET1_NAME)
 
-CFLAGS  +=-I./ 
-CFLAGS  +=-L./lib
+CFLAGS  +=-I ./  
+#LDFLAGS=-L./lib 
 CFLAGS=  -O2 $(APP_FLAGS) -Werror
 #LDFLAGS  += -Wl -ldbus-1 -lpthread
-LDFLAGS  +=  -lpthread -ldbus-1 -lxml2 
-INCLUDES = -I./include -I./include/dbus/ -I./include/libxml
-#INCLUDES = -I./include -I./include/dbus/ 
+LDFLAGS  += -L./lib -lpthread -ldbus-1 -lxml2 
+#LDFLAGS  += -L./lib/libxml2.so -lpthread    
+INCLUDES = -I ./include -I ./include/dbus/ -I ./include/libxml/libxml/ 
 
 SRCDIR = src
 TARGET_DIR=target

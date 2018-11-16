@@ -37,7 +37,8 @@
 #ifndef TIOCGRS485
     #define TIOCGRS485     0x542E
 #endif
-
+#define DEVICE_TREE_CAMPATIABLE "/sys/firmware/devicetree/base/compatible"
+#define DEVICE_IMX6 "imx6"
 struct tty_dev
 {
 	char tty_dev[MAX_INPUT];
@@ -49,7 +50,19 @@ struct tty_dev
 	int rs485_mode;
 };
 typedef struct tty_dev tty_dev_t;
+struct g_opened_tty{
+    char *device_name;
+    int fd;
+    int bitrate;
+    int datasize;
+    int mode;
+    int flow;
+    int par;
+    int stop;
 
+    int open_cnt;
+    pthread_t pthread_id;
+};
 DBusConnection * tty_send_conn;
 /******************************************************************************
   Function:       tty_init
@@ -60,7 +73,7 @@ DBusConnection * tty_send_conn;
   Return:         int		-- return the tty fd
   Others:         NONE
 *******************************************************************************/
-int	tty_open(char * tty);
+int	tty_open(char * tty,struct g_opened_tty *opeded_tty_data);
 
 void	tty_close(int fd);
 /******************************************************************************
@@ -79,7 +92,7 @@ void	tty_close(int fd);
   Others:         NONE
 *******************************************************************************/
 int 			tty_setting(int fd, int bitrate, int datasize, int mode, int flow, int par, int stop);
-
+void tty_init();
 int				tty_read(int fd, char *frame);
 int	 tty_write(int fd, char *frame, int len);
 
@@ -87,7 +100,8 @@ int 			tty_mode(const int fd,  int mode);
 void get_serial_list(char * result);
 void get_rs485_list(char *result);
 void parse_tty_param(char *tty_param);
-void delete_tty_read_thread(void);
-void     create_tty_read_thread();
-void create_can_read_thread(void);
+void delete_tty_read_thread(int fd);
+int set_imx6ul_rs485(int fd,int len,int statu);
+void create_can_read_thread(int fd);
+void create_tty_read_thread(int thread_cnt,int fd);
 #endif	 // __TTY_H__	

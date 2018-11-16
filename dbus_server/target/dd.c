@@ -3,8 +3,13 @@
 #include <string.h>
 #include <dbus/dbus.h>
 #include <unistd.h>
-#include <libxml/parser.h>  
-#include <libxml/xmlmemory.h>  
+//#include <libxml/parser.h>  
+//#include <libxml/xmlmemory.h>  
+
+//#include <libxml/parser.h>
+//#include <libxml/tree.h>
+//#include <libxml/xmlmemory.h>
+//
 #include "led.h"
 #include "dbus_server.h"
 #include "tty.h"
@@ -333,12 +338,12 @@ void Introspect_method_call(DBusMessage * msg, DBusConnection * conn)
 {
     DBusMessage * reply;
 	DBusMessageIter arg;
-    xmlChar *xmlbuf;
+        xmlChar *xmlbuf;
 	xmlDocPtr doc; 
 	int buffersize;
 	char *respone;
 	
-	doc = xmlReadFile("/usr/share/myir/mxde.xml","UTF-8",XML_PARSE_RECOVER);  
+//	doc = xmlReadFile("/usr/share/myir/mxde.xml","UTF-8",XML_PARSE_RECOVER);  
     xmlDocDumpFormatMemory(doc, &xmlbuf, &buffersize, 1);  
 	respone = (char *)xmlbuf;
 	
