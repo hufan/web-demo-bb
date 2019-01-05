@@ -31,22 +31,17 @@ footer{
 }
 #left{
 	float:left;
-	width:200px;
+	width:199px;
 	padding:10px 0;
-	background:url('../images_en/sp.png') no-repeat right center;
+	margin-top: 77px;
+	border-right:1px solid #ccc;
 }
 #left span{
 	display:inline-block;
 	width:100%;
 	height:80px;
-	margin:5px auto;
+	margin:0px auto 10px auto;
 	cursor:pointer;
-}
-#left span.menu1{
-	background:url('../images_en/left1.png') no-repeat center center;
-}
-#left span.menu1_on{
-	background:url('../images_en/left1-2.png') no-repeat center center;
 }
 #left span.menu2{
 	background:url('../images_en/left2.png') no-repeat center center;
@@ -59,12 +54,6 @@ footer{
 }
 #left span.menu3_on{
 	background:url('../images_en/left3-2.png') no-repeat center center;
-}
-#left span.menu4{
-	background:url('../images_en/left4.png') no-repeat center center;
-}
-#left span.menu4_on{
-	background:url('../images_en/left4-2.png') no-repeat center center;
 }
 #left span.menu5{
 	background:url('../images_en/left5.png') no-repeat center center;
@@ -138,7 +127,9 @@ table tr td select{
 	background:url('../images_en/orange.png') no-repeat center center;
 }
 .mright50{margin-right:50px;}
-
+.nav{
+	margin-top:25px;
+}
 .nav span{
 	cursor:pointer;
 	display:inline-block;

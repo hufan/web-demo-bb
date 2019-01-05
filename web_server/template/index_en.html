@@ -20,52 +20,10 @@
 		<div id="left">
 			<span class="menus menu1">&nbsp;</span>
 			<span class="menus menu2">&nbsp;</span>
-			<span class="menus menu3">&nbsp;</span>
+			<span class="menus menu3" id="eth_update">&nbsp;</span>
 			<span class="menus menu4">&nbsp;</span>
-			<span class="menus menu5" id="eth_update">&nbsp;</span>
-			<span class="menus menu6">&nbsp;</span>
 		</div>
 		<div id="right">
-			<section class="tab" id="led">
-				<h2>Test LED</h2>
-				<div class="one_item">
-					<input class="text" id="led1" value="cpu" type="text" readonly />
-					<input class="button menu" str_op="led_open" str_num="1" type="button" value="LED_ON"></input>
-					<input class="button second menu" str_op="led_close" str_num="1" type="button" value="LED_OFF"></input>
-					<img class="led" id="img1" src="statics/images_en/led_red.png" />
-				</div>
-				<div class="one_item" style="display:none">
-					<input class="text" id="led2" value="cpu" type="text" readonly />
-					<input class="button menu" str_op="led_open" str_num="2" type="button" value="LED_ON"></input>
-					<input class="button second menu" type="button"  str_op="led_close" str_num="2" value="LED_OFF"></input>
-					<img class="led" id="img2" src="statics/images_en/led_red.png" />
-				</div>
-				<div class="one_item" style="display:none">
-					<input class="text" id="led3" value="cpu" type="text" readonly />
-					<input class="button menu" str_op="led_open" str_num="3" type="button" value="LED_ON"></input>
-					<input class="button second menu" type="button"  str_op="led_close" str_num="3" value="LED_OFF"></input>
-					<img class="led" id="img3" src="statics/images_en/led_red.png" />
-				</div>
-				<div class="one_item" style="display:none">
-					<input class="text" id="led4" value="cpu" type="text" readonly />
-					<input class="button menu" str_op="led_open" str_num="4" type="button" value="LED_ON"></input>
-					<input class="button second menu" type="button"  str_op="led_close" str_num="4" value="LED_OFF"></input>
-					<img class="led" id="img4" src="statics/images_en/led_red.png" />
-				</div>
-				<div class="one_item" style="display:none">
-					<input class="text" id="led5" value="cpu" type="text" readonly />
-					<input class="button menu" str_op="led_open" str_num="5" type="button" value="LED_ON"></input>
-					<input class="button second menu" type="button"  str_op="led_close" str_num="5" value="LED_OFF"></input>
-					<img class="led" id="img5" src="statics/images_en/led_red.png" />
-				</div>
-				<div class="one_item" style="display:none">
-					<input class="text" id="led6" value="cpu" type="text" readonly />
-					<input class="button menu" str_op="led_open" str_num="6" type="button" value="LED_ON"></input>
-					<input class="button second menu" type="button"  str_op="led_close" str_num="6" value="LED_OFF"></input>
-					<img class="led" id="img6" src="statics/images_en/led_red.png" />
-				</div>
-
-			</section>
 			<section class="tab">
 				<h2>Test RS232</h2>
 				<table>
@@ -191,67 +149,7 @@
 				</tr>
 				</table>
 			</section>
-			<section class="tab">
-				<h2>Test CAN</h2>
-				<table>
-				<tr>
-					<td>					
-					Port
-					<!--<select id="can_name" name="name" str_op="can_change" onchange="change_parameter($(this).attr('str_op'));">-->
-						<!--<option value="can0" selected>can0-->
-						<!--<option value="can1">can1-->
-					<!--</select>-->
 
-					<select id="can_name" name="name" str_op="can_change" onchange="change_parameter($(this).attr('str_op'));">
-						<!--<option value="/dev/ttymxc1" selected>/dev/ttymxc1-->
-						<!--<option value="/dev/ttymxc3">/dev/ttymxc3-->
-					</select>
-
-					Baud rate
-					<select id="can_baudrate" name="name" str_op="can_change" onchange="change_parameter($(this).attr('str_op'));">
-						<option value="20" selected>20 KBPS
-						<option value="50">50 KBPS
-						<option value="125">125 KBPS
-						<option value="250">250 KBPS
-						<option value="500">500 KBPS
-						<option value="800">800 KBPS
-						<option value="1000">1000 KBPS
-					</select>
-					Loop
-					<select id="can_loop" name="name" str_op="can_change" onchange="change_parameter($(this).attr('str_op'));">
-						<option value="OFF" selected>OFF
-						<option value="ON">ON
-					</select>
-					</td>
-				</tr>
-				<tr>
-					<td>
-					<input class="button mright50 menu" id="can_button" str_op="operate"  onclick="can_sendMsg($(this).attr('str_op'),value)" type="button" value="open"></input>
-
-					</td>
-				</tr>
-				<tr>
-					<td>
-					Can ID：
-					<input id="can_id" type="text"  value="100"  style="width:8%;height:15px">
-					</td>
-				</tr>
-				<tr>
-					<td>
-					Send：
-					<textarea id="can_buf_data" name="" rows="5" cols="100"></textarea>
-					<input class="button mright50 menu" str_op="send"  onclick="can_sendMsg($(this).attr('str_op'))" type="button" value="send"></input>
-					</td>
-				</tr>
-				<tr>
-					<td>
-					Recv：
-					<textarea id="can_recv_data" name="" rows="5" cols="100"></textarea>
-					<input class="button orange fr" str_op="clear"  onclick="can_sendMsg($(this).attr('str_op'))" type="button" value="clear"></input>
-					</td>
-				</tr>
-				</table>
-			</section>
 			<section class="tab" id="ethernet" >
 				<h2>EtherNet</h2>
 				<div id="netcalss" class="nav">
@@ -413,7 +311,7 @@
 		<div class="clear"></div>
 	</div>
 	<footer>
-		@2017 米尔电子版权所有
+		@2018 米尔电子版权所有
 	</footer>
 </body>
 <script src="statics/css/jquery.js" type="text/javascript"></script>
