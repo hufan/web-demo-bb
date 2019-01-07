@@ -379,7 +379,7 @@ $(document).ready(function(){
 <script type="text/javascript">
 		var ws = new WebSocket("ws://{{info_ip}}:{{info_port_eth}}/{{info_event}}"); // 新建一个ws连接
         ws.onopen = function() {
-			ledlist_sendMsg();
+			//ledlist_sendMsg();
         };
         ws.onmessage = function(e){
             var data = e.data;

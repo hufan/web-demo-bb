@@ -32,7 +32,6 @@ footer{
 #left{
 	float:left;
 	width:199px;
-	padding:10px 0;
 	margin-top: 77px;
 	border-right:1px solid #ccc;
 }
@@ -43,28 +42,28 @@ footer{
 	margin:0px auto 10px auto;
 	cursor:pointer;
 }
-#left span.menu2{
+#left span.menu1{
 	background:url('../images_en/left2.png') no-repeat center center;
 }
-#left span.menu2_on{
+#left span.menu1_on{
 	background:url('../images_en/left2-2.png') no-repeat center center;
 }
-#left span.menu3{
+#left span.menu2{
 	background:url('../images_en/left3.png') no-repeat center center;
 }
-#left span.menu3_on{
+#left span.menu2_on{
 	background:url('../images_en/left3-2.png') no-repeat center center;
 }
-#left span.menu5{
+#left span.menu3{
 	background:url('../images_en/left5.png') no-repeat center center;
 }
-#left span.menu5_on{
+#left span.menu3_on{
 	background:url('../images_en/left5-2.png') no-repeat center center;
 }
-#left span.menu6{
+#left span.menu4{
 	background:url('../images_en/left6.png') no-repeat center center;
 }
-#left span.menu6_on{
+#left span.menu4_on{
 	background:url('../images_en/left6-2.png') no-repeat center center;
 }
 #right{

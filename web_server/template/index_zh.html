@@ -355,7 +355,7 @@ var element_not = {"open_uart_str":"0","close_uart_str":"0","open_can_str":"0","
 	var ws = new WebSocket("ws://{{info_ip}}:{{info_port_eth}}/{{info_event}}"); // 新建一个ws连接
 	ws.onopen = function() {
         set_define();
-        ledlist_sendMsg();
+        //ledlist_sendMsg();
 	};
 	ws.onmessage = function(e){
 			analyze_recv_data(e);
