@@ -14,7 +14,7 @@
                         "myc:blue":"user - D13  - User Board"
                 },
                 "system": {
-                        "HMI_version": "MEasy HMI V1.0",
+                        "HMI_version": "MEasy HMI V1.1",
                         "linux_version": "linux-4.1.15",
                         "uboot_version": "u-boot-2016.03",
                         "gcc_version": "arm-linux-gcc 5.3.0",
